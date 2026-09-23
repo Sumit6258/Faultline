@@ -1,0 +1,10 @@
+# This file is intentionally close to empty right now. Phase 1 labs
+# (rate-limiting, caching, consistent-hashing) are plain Go binaries and
+# don't need external services. Services get added here as later labs
+# need them: Postgres for the database labs, Redis for the distributed
+# rate limiter variant described in labs/rate-limiting/README.md, Kafka
+# for the messaging lab.
+
+version: "3.9"
+
+services: {}

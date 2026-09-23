@@ -1,0 +1,28 @@
+# Go
+*.exe
+*.test
+*.out
+faultline.zip
+
+# Build artifacts
+labs/*/bin/
+labs/*/cmd/*/server
+labs/*/cmd/*/demo
+
+# Node, for web/interactive-lab later
+node_modules/
+dist/
+
+# Python, for future simulation tooling
+__pycache__/
+*.pyc
+.venv/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+
+# Env files
+.env
+.env.local
