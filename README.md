@@ -14,12 +14,12 @@ Not a system design interview cheat sheet. Not a collection of architecture diag
 
 ## Status
 
-Phase 1 is in progress. Three labs are live. See [ROADMAP.md](ROADMAP.md) for what's next.
+Phase 1 is done. Phase 2 is in progress, three of six core labs are live so far. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Quickstart
 
 ```bash
-git clone https://github.com/Sumit6258/faultline.git
+git clone https://github.com/Sumit6258/Faultline.git
 cd faultline
 make setup
 make test
@@ -34,6 +34,9 @@ make test
 | [Rate Limiting](labs/rate-limiting) | Fixed window, sliding window, token bucket, and leaky bucket, plus why per-node counters fail behind a load balancer | Go |
 | [Caching](labs/caching) | Cache-aside with TTL and LRU eviction, and request coalescing to stop a cache stampede | Go |
 | [Consistent Hashing](labs/consistent-hashing) | A hash ring with virtual nodes, measured against naive modulo hashing when a node is added or removed | Go |
+| [Distributed Locks](labs/distributed-locks) | Time bounded leases and fencing tokens, and exactly why a stale lock holder can still corrupt data without them | Go |
+| [Leader Election](labs/leader-election) | Heartbeat based election: a leader that renews normally, then crashes, then a new election | Go |
+| [Circuit Breakers](labs/circuit-breakers) | The closed, open, half-open cycle, including keeping concurrent callers from flooding a half-open trial | Go |
 
 More labs and full systems are planned. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full catalog and [ROADMAP.md](ROADMAP.md) for build order.
 

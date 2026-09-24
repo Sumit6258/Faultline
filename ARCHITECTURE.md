@@ -34,12 +34,12 @@ faultline/
 | Category | Lab | Status |
 |---|---|---|
 | Resilience | Rate Limiting | done |
-| Resilience | Circuit Breakers | planned |
+| Resilience | Circuit Breakers | done |
 | Resilience | Retries, Backoff, and Jitter | planned |
 | Caching | Cache Aside and Eviction | done |
 | Caching | Stampede Prevention | done |
-| Coordination | Distributed Locks | planned |
-| Coordination | Leader Election | planned |
+| Coordination | Distributed Locks | done |
+| Coordination | Leader Election | done |
 | Coordination | Consensus (Raft) | planned |
 | Data | Replication and Replication Lag | planned |
 | Data | Sharding and Consistent Hashing | done |

@@ -1,6 +1,6 @@
 .PHONY: help setup test test-race lint bench run clean
 
-LABS := rate-limiting caching consistent-hashing
+LABS := rate-limiting caching consistent-hashing distributed-locks leader-election circuit-breakers
 
 help:
 	@echo "Available targets:"

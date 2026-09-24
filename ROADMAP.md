@@ -9,12 +9,12 @@
 
 ## Phase 2: Core labs
 
-- [ ] Distributed Locks
-- [ ] Leader Election
+- [x] Distributed Locks
+- [x] Leader Election
+- [x] Circuit Breakers
+- [ ] Retries, Backoff, and Jitter
 - [ ] Replication and Replication Lag
 - [ ] Kafka Messaging and Consumer Lag
-- [ ] Circuit Breakers
-- [ ] Retries, Backoff, and Jitter
 
 ## Phase 3: First systems
 
