@@ -1,6 +1,6 @@
 .PHONY: help setup test test-race lint bench run clean
 
-LABS := rate-limiting caching consistent-hashing distributed-locks leader-election circuit-breakers
+LABS := rate-limiting caching consistent-hashing distributed-locks leader-election circuit-breakers retries-backoff replication kafka-messaging
 
 help:
 	@echo "Available targets:"

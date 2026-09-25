@@ -14,7 +14,7 @@ Not a system design interview cheat sheet. Not a collection of architecture diag
 
 ## Status
 
-Phase 1 is done. Phase 2 is in progress, three of six core labs are live so far. See [ROADMAP.md](ROADMAP.md) for what's next.
+Phase 1 and Phase 2 are done, nine labs are live. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Quickstart
 
@@ -37,6 +37,9 @@ make test
 | [Distributed Locks](labs/distributed-locks) | Time bounded leases and fencing tokens, and exactly why a stale lock holder can still corrupt data without them | Go |
 | [Leader Election](labs/leader-election) | Heartbeat based election: a leader that renews normally, then crashes, then a new election | Go |
 | [Circuit Breakers](labs/circuit-breakers) | The closed, open, half-open cycle, including keeping concurrent callers from flooding a half-open trial | Go |
+| [Retries, Backoff, and Jitter](labs/retries-backoff) | Why fixed-delay retries synchronize into a storm, and how full jitter spreads them out | Go |
+| [Replication](labs/replication) | Asynchronous replication lag and the read-your-own-write problem, measured across different lag values | Go |
+| [Kafka Messaging](labs/kafka-messaging) | Partitions, consumer groups, consumer lag, idempotent consumption, and a dead letter queue | Go |
 
 More labs and full systems are planned. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full catalog and [ROADMAP.md](ROADMAP.md) for build order.
 

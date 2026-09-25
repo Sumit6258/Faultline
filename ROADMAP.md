@@ -7,14 +7,14 @@
 - [x] Caching lab
 - [x] Consistent Hashing lab
 
-## Phase 2: Core labs
+## Phase 2: Core labs (done)
 
 - [x] Distributed Locks
 - [x] Leader Election
 - [x] Circuit Breakers
-- [ ] Retries, Backoff, and Jitter
-- [ ] Replication and Replication Lag
-- [ ] Kafka Messaging and Consumer Lag
+- [x] Retries, Backoff, and Jitter
+- [x] Replication and Replication Lag (simulated, see labs/replication's README)
+- [x] Kafka Messaging and Consumer Lag (simulated, see labs/kafka-messaging's README)
 
 ## Phase 3: First systems
 

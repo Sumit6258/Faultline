@@ -35,15 +35,15 @@ faultline/
 |---|---|---|
 | Resilience | Rate Limiting | done |
 | Resilience | Circuit Breakers | done |
-| Resilience | Retries, Backoff, and Jitter | planned |
+| Resilience | Retries, Backoff, and Jitter | done |
 | Caching | Cache Aside and Eviction | done |
 | Caching | Stampede Prevention | done |
 | Coordination | Distributed Locks | done |
 | Coordination | Leader Election | done |
 | Coordination | Consensus (Raft) | planned |
-| Data | Replication and Replication Lag | planned |
+| Data | Replication and Replication Lag | done (simulated, see labs/replication) |
 | Data | Sharding and Consistent Hashing | done |
-| Messaging | Kafka: Partitions, Consumer Lag, DLQ | planned |
+| Messaging | Kafka: Partitions, Consumer Lag, DLQ | done (simulated, see labs/kafka-messaging) |
 
 ## System catalog
 
