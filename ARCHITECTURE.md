@@ -51,7 +51,7 @@ Tier 1, built first:
 
 | System | Core patterns | Language |
 |---|---|---|
-| URL Shortener | ID generation, cache-aside, hot key handling | Go |
+| URL Shortener (done) | ID generation, cache-aside, hot key handling | Go |
 | Payment Platform | idempotency, outbox, saga, reconciliation | Java plus a Go gateway |
 | Notification Platform | multi-channel fan-out, retry and DLQ | Go |
 | Social Feed | fan-out on write versus fan-out on read | Go |

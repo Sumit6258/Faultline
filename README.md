@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/faultline-banner.png" alt="Faultline - Build, Scale, Break, Understand" width="750">
+</p>
+
 # Faultline
 
 A hands-on laboratory for the patterns that hold large-scale systems together, and for what happens when they don't.
@@ -14,7 +18,7 @@ Not a system design interview cheat sheet. Not a collection of architecture diag
 
 ## Status
 
-Phase 1 and Phase 2 are done, nine labs are live. See [ROADMAP.md](ROADMAP.md) for what's next.
+Phase 1 and Phase 2 are done, nine labs are live. Phase 3 is in progress: the first complete system, URL Shortener, is live. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Quickstart
 
@@ -42,6 +46,14 @@ make test
 | [Kafka Messaging](labs/kafka-messaging) | Partitions, consumer groups, consumer lag, idempotent consumption, and a dead letter queue | Go |
 
 More labs and full systems are planned. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full catalog and [ROADMAP.md](ROADMAP.md) for build order.
+
+## Systems
+
+| System | Built from | Language |
+|---|---|---|
+| [URL Shortener](systems/url-shortener) | Cache-aside, a per-client rate limiter, async click analytics, and two compared ID generation strategies, wired into one working service | Go |
+
+More systems are planned.
 
 ## Repository map
 

@@ -18,8 +18,8 @@
 
 ## Phase 3: First systems
 
-- [ ] URL Shortener
-- [ ] Payment Platform, part 1: idempotency and outbox
+- [x] URL Shortener
+- [ ] Payment Platform, part 1: idempotency and outbox (Java vs FastAPI still open, see ARCHITECTURE.md's technology strategy)
 
 ## Phase 4: Interactive lab
 
