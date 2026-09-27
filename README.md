@@ -18,7 +18,7 @@ Not a system design interview cheat sheet. Not a collection of architecture diag
 
 ## Status
 
-Phase 1 and Phase 2 are done, nine labs are live. Phase 3 is in progress: the first complete system, URL Shortener, is live. See [ROADMAP.md](ROADMAP.md) for what's next.
+Phase 1, Phase 2, and Phase 3 are done: nine labs, plus two complete systems, URL Shortener and Payment Platform. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Quickstart
 
@@ -52,6 +52,7 @@ More labs and full systems are planned. See [ARCHITECTURE.md](ARCHITECTURE.md) f
 | System | Built from | Language |
 |---|---|---|
 | [URL Shortener](systems/url-shortener) | Cache-aside, a per-client rate limiter, async click analytics, and two compared ID generation strategies, wired into one working service | Go |
+| [Payment Platform](systems/payment-platform) | Idempotency safe under real concurrent requests, and the transactional outbox pattern, proven with a relay that survives a mid-batch crash | Python (FastAPI) |
 
 More systems are planned.
 

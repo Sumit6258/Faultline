@@ -6,9 +6,9 @@ This document describes how Faultline is organized and why. For what's built so 
 
 Go is the primary language for distributed systems and infrastructure work: rate limiters, caches, coordination primitives, gateways. Its concurrency primitives (goroutines, channels, sync, context) map directly onto the problems this repository is about, and a single static binary is the simplest thing to run and load test.
 
-Java is used for one enterprise transactional system, the payment platform, to demonstrate a different concurrency and transaction model than Go's.
+Python was used for the payment platform's transactional core (idempotency and the outbox pattern), a change from this document's original plan, which called for Java, to demonstrate the JVM's own concurrency and transaction model. Python was chosen instead to match the actual language this portfolio and job search run on, FastAPI and SQLite proved fully sufficient for both guarantees this system's first slice actually needs: a database-enforced uniqueness constraint and a real multi-statement transaction. See systems/payment-platform's README for the reasoning in full. Java remains a reasonable choice for a later slice of this system that specifically needs to demonstrate JVM-side transaction management or Spring's ecosystem, which this first slice did not.
 
-Python is used for simulation, traffic generation, and analysis tooling, not for latency critical services.
+Python is also used for simulation, traffic generation, and analysis tooling, not for latency critical services.
 
 TypeScript is used for the interactive visualization lab in web/interactive-lab.
 
@@ -52,7 +52,7 @@ Tier 1, built first:
 | System | Core patterns | Language |
 |---|---|---|
 | URL Shortener (done) | ID generation, cache-aside, hot key handling | Go |
-| Payment Platform | idempotency, outbox, saga, reconciliation | Java plus a Go gateway |
+| Payment Platform (part 1 done) | idempotency, outbox, saga, reconciliation | Python (FastAPI), part 1 built; saga, fraud, and ledger still planned |
 | Notification Platform | multi-channel fan-out, retry and DLQ | Go |
 | Social Feed | fan-out on write versus fan-out on read | Go |
 

@@ -16,10 +16,10 @@
 - [x] Replication and Replication Lag (simulated, see labs/replication's README)
 - [x] Kafka Messaging and Consumer Lag (simulated, see labs/kafka-messaging's README)
 
-## Phase 3: First systems
+## Phase 3: First systems (done)
 
 - [x] URL Shortener
-- [ ] Payment Platform, part 1: idempotency and outbox (Java vs FastAPI still open, see ARCHITECTURE.md's technology strategy)
+- [x] Payment Platform, part 1: idempotency and outbox (Python/FastAPI, see systems/payment-platform's README for why)
 
 ## Phase 4: Interactive lab
 
