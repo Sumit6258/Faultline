@@ -52,7 +52,7 @@ func TestSlidingWindow_SmoothsBoundaryBurst(t *testing.T) {
 	if allowedSecondBurst >= limit {
 		t.Fatalf("sliding window should have blocked most of the second burst since it overlaps the first, got %d of %d allowed", allowedSecondBurst, limit)
 	}
-	t.Logf("fixed window would have allowed %d total across the boundary, sliding window allowed %d", limit*2, limit+allowedSecondBurst)
+	t.Logf("sliding window let %d of %d through across the boundary", limit+allowedSecondBurst, limit*2)
 }
 
 func TestSlidingWindow_ConcurrentAccessIsSafe(t *testing.T) {

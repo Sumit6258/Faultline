@@ -50,7 +50,7 @@ type Limiter interface {
 }
 ```
 
-FixedWindow, SlidingWindowCounter, TokenBucket, and LeakyBucket each implement it. All four take an injected clock so the tests don't depend on real sleeps. Run any of them behind the demo HTTP server:
+FixedWindow, SlidingWindowCounter, TokenBucket, and LeakyBucket each implement it. All four take an injected clock so the tests don't depend on real sleeps. A fifth type, LeakyBucketQueue, has a different signature because it returns how long a request must wait instead of a yes or no, see Trade-offs for why it exists. Run any of them behind the demo HTTP server:
 
 ```bash
 go run ./cmd/server -algo=token-bucket -limit=10
@@ -84,11 +84,12 @@ Measured on this sandbox, Go 1.22.2, linux/amd64, 1 vCPU, Intel Xeon at 2.10GHz,
 
 | Algorithm | ns/op | allocs/op |
 |---|---|---|
-| FixedWindow | 87.9 | 0 |
-| SlidingWindowCounter | 101.4 | 0 |
-| TokenBucket | 95.4 | 0 |
-| LeakyBucket | 103.0 | 0 |
-| TokenBucket, 10000 distinct keys | 167.5 | 1 |
+| FixedWindow | 87.6 | 0 |
+| SlidingWindowCounter | 118.0 | 0 |
+| TokenBucket | 108.6 | 0 |
+| LeakyBucket (meter) | 106.7 | 0 |
+| LeakyBucketQueue | 155.0 | 1 |
+| TokenBucket, 10000 distinct keys | 190.5 | 1 |
 
 Full numbers, environment details, and the load test results are in [benchmarks/RESULTS.md](benchmarks/RESULTS.md) and [load-tests/RESULTS.md](load-tests/RESULTS.md).
 
@@ -96,9 +97,24 @@ Full numbers, environment details, and the load test results are in [benchmarks/
 
 | Algorithm | Allows bursts | Memory per key | Boundary problem |
 |---|---|---|---|
-| Fixed window | No, capped at the limit per window | One counter | Yes, up to 2x the limit right at a window edge |
+| Fixed window | No, capped at the limit per window | One counter | Yes, up to 2x the limit across a window edge, measured below |
 | Sliding window counter | Slightly | One counter plus one previous count | Mostly fixed, it's an approximation |
-| Token bucket | Yes, up to capacity | One float plus a timestamp | None |
-| Leaky bucket | No, smooths into a steady output | One float plus a timestamp | None, though this implementation rejects excess requests rather than queueing them |
+| Token bucket | Yes, up to capacity | One float plus a timestamp | None, but it can pass capacity plus one refill period's worth in a short span |
+| Leaky bucket, meter (LeakyBucket) | Yes, up to capacity, identical to a token bucket | One float plus a timestamp | Same as a token bucket, it makes the same decisions |
+| Leaky bucket, queue (LeakyBucketQueue) | No, releases one request per interval regardless of arrivals | A short list of release times, at most capacity long | None, but requests wait instead of failing |
 
-Token bucket is the most common default because it allows reasonable bursts (a user opening five tabs at once shouldn't get rate limited) while still enforcing a real ceiling. Fixed window is the cheapest to reason about and implement correctly, which is why it still shows up often despite the boundary problem. Leaky bucket fits best when the downstream system genuinely needs a smoothed, steady rate, like a queue worker that can only process at a fixed pace.
+### The same traffic through every algorithm
+
+One request to anchor the first window, then limit minus one just before the window ends, then limit just after it ends, with a limit of 4 per second. This is measured by `TestBoundaryBurst`, not estimated:
+
+```
+fixed window           accepted 8 of 8
+sliding window         accepted 5 of 8
+token bucket           accepted 5 of 8
+leaky bucket (meter)   accepted 5 of 8
+leaky bucket (queue)   accepted 6 of 8, released no faster than one per 250ms
+```
+
+Fixed window let through twice its limit around the boundary. That is the whole reason the sliding window counter exists. Token bucket and the leaky bucket meter land on the same number, and that is not a coincidence: `TestLeakyBucketMeter_DecidesExactlyLikeTokenBucket` runs 5000 random requests through both and they never disagree. A leaky bucket that only rejects is a token bucket described from the other side. What makes a leaky bucket different is the queue variant, which absorbs a burst by delaying it instead of refusing it, at the price of latency for every request that waits.
+
+Token bucket is the most common default because it allows reasonable bursts (a user opening five tabs at once shouldn't get rate limited) while still enforcing a real ceiling. Fixed window is the cheapest to reason about and implement correctly, which is why it still shows up often despite the boundary problem. The queue variant fits when the downstream system genuinely needs a smoothed, steady rate, like a worker that can only process at a fixed pace, and can tolerate requests waiting.

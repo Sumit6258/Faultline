@@ -74,10 +74,10 @@ Measured on this sandbox, Go 1.22.2, linux/amd64, 1 vCPU, Intel Xeon at 2.10GHz:
 
 | Implementation | ns/op | allocs/op |
 |---|---|---|
-| Ring.Get, 150 replicas, 20 nodes | 208.8 | 1 |
-| NaiveModN.Get, 20 nodes | 66.91 | 1 |
+| Ring.Get, 150 replicas, 20 nodes | 172.6 | 1 |
+| NaiveModN.Get, 20 nodes | 30.9 | 1 |
 
-Ring costs about 3x more per lookup, the price of the binary search over virtual points. Full numbers, plus the distribution and remapping data, are in [benchmarks/RESULTS.md](benchmarks/RESULTS.md).
+Ring costs about 5.6x more per lookup, the price of the binary search over 3000 virtual points versus one hash and one modulo. An earlier measurement of this lab built each benchmark's key string inside the timed loop, which added the same fixed cost to both sides and made Ring look only 3x more expensive instead of 5.6x, the loop below shows why. Full numbers, plus the distribution and remapping data, are in [benchmarks/RESULTS.md](benchmarks/RESULTS.md).
 
 ## Trade-offs
 

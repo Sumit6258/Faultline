@@ -6,7 +6,7 @@ Measured, not estimated. Reproduce with `make bench LAB=consistent-hashing` from
 
 - Go 1.22.2, linux/amd64
 - CPU: Intel Xeon @ 2.10GHz, 1 vCPU (a shared sandbox, not a dedicated benchmarking host, treat these as directional)
-- Date: 2026-09-23
+- Date: 2026-09-29
 
 ## Get() throughput
 
@@ -14,10 +14,12 @@ Measured, not estimated. Reproduce with `make bench LAB=consistent-hashing` from
 
 | Implementation | ns/op | B/op | allocs/op |
 |---|---|---|---|
-| Ring, 150 virtual nodes per real node | 208.8 | 15 | 1 |
-| NaiveModN | 66.91 | 15 | 1 |
+| Ring, 150 virtual nodes per real node | 172.6 | 8 | 1 |
+| NaiveModN | 30.9 | 8 | 1 |
 
-The allocation in both cases comes from converting the key to a byte slice for crc32.ChecksumIEEE, not from anything specific to the ring. Ring costs about 3x more per lookup than naive mod-N, because Get does a binary search over 3000 sorted hash values (20 nodes times 150 replicas), where naive mod-N does one hash and one modulo. That extra cost buys the remapping behavior below.
+The allocation in both cases comes from converting the key to a byte slice for crc32.ChecksumIEEE, not from anything specific to the ring. Ring costs about 5.6x more per lookup than naive mod-N, because Get does a binary search over 3000 sorted points (20 nodes times 150 replicas), where naive mod-N does one hash and one modulo. That extra cost buys the remapping behavior below.
+
+A first version of this benchmark built each key string inside the timed loop for both functions. That added the same roughly 140ns of string-building work to both sides, which is why it originally reported 208.8ns and 66.91ns, a 3x gap instead of the real 5.6x: a fixed cost added to two different base numbers shrinks their ratio. Moving key construction before b.ResetTimer() for both benchmarks, shown in bench_test.go, is what fixed it.
 
 ## Distribution evenness
 

@@ -45,3 +45,11 @@ func BenchmarkTokenBucket_Allow_ManyKeys(b *testing.B) {
 		tb.Allow("key-" + strconv.Itoa(i%10000))
 	}
 }
+
+func BenchmarkLeakyBucketQueue_Admit(b *testing.B) {
+	q := NewLeakyBucketQueue(1000, time.Nanosecond)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		q.Admit("bench-key")
+	}
+}

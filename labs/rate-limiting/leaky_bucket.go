@@ -5,9 +5,13 @@ import (
 	"time"
 )
 
-// LeakyBucket queues requests into a bucket of fixed capacity that leaks
-// (drains) at a constant rate. Unlike TokenBucket it smooths a burst into a
-// steady outflow instead of letting the whole burst through immediately.
+// LeakyBucket is the meter reading of a leaky bucket: a bucket of fixed
+// capacity that drains at a constant rate, where a request is rejected if
+// it would overflow. Nothing is queued and nothing is delayed, so it
+// accepts exactly the same requests a TokenBucket does, the water level is
+// just capacity minus the tokens left. equivalence_test.go measures that.
+// For the reading that actually smooths bursts, by holding requests in a
+// queue and releasing them at a constant rate, see LeakyBucketQueue.
 type LeakyBucket struct {
 	mu       sync.Mutex
 	capacity float64

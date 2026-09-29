@@ -1,3 +1,3 @@
-module github.com/Sumit6258/faultline/labs/caching
+module github.com/Sumit6258/Faultline/labs/caching
 
 go 1.22

@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	cache "github.com/Sumit6258/faultline/labs/caching"
+	cache "github.com/Sumit6258/Faultline/labs/caching"
 )
 
 func main() {

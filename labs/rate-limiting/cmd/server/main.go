@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	ratelimit "github.com/Sumit6258/faultline/labs/rate-limiting"
+	ratelimit "github.com/Sumit6258/Faultline/labs/rate-limiting"
 )
 
 func main() {

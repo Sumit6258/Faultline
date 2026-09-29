@@ -1,6 +1,7 @@
 package consistenthash
 
 import (
+	"hash/crc32"
 	"strconv"
 	"testing"
 )
@@ -68,5 +69,40 @@ func TestRing_NodesIsSortedAndDeduplicated(t *testing.T) {
 	got := r.Nodes()
 	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
 		t.Fatalf("expected sorted, deduplicated [a b], got %v", got)
+	}
+}
+
+// A 32 bit hash collides eventually, and with many virtual nodes per real
+// node two different nodes can land on the exact same position. This test
+// forces that by squeezing every hash into 16 slots, far fewer than the 24
+// points being placed, so collisions between nodes are guaranteed.
+func TestRing_HashCollisionsBetweenNodesDoNotCorruptTheRing(t *testing.T) {
+	weak := func(s string) uint32 { return crc32.ChecksumIEEE([]byte(s)) % 16 }
+	r := NewRing(8)
+	r.hashFn = weak
+	for _, n := range []string{"a", "b", "c"} {
+		r.AddNode(n)
+	}
+
+	before := make(map[string]string)
+	for i := 0; i < 500; i++ {
+		k := "key-" + strconv.Itoa(i)
+		before[k] = r.Get(k)
+		if before[k] != "a" && before[k] != "b" && before[k] != "c" {
+			t.Fatalf("%s mapped to %q with all three nodes present", k, before[k])
+		}
+	}
+
+	r.RemoveNode("b")
+
+	for i := 0; i < 500; i++ {
+		k := "key-" + strconv.Itoa(i)
+		after := r.Get(k)
+		if after != "a" && after != "c" {
+			t.Fatalf("%s mapped to %q after removing b, want a or c", k, after)
+		}
+		if before[k] != "b" && after != before[k] {
+			t.Fatalf("%s moved from %s to %s although it was not on the removed node", k, before[k], after)
+		}
 	}
 }

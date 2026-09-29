@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	ch "github.com/Sumit6258/faultline/labs/consistent-hashing"
+	ch "github.com/Sumit6258/Faultline/labs/consistent-hashing"
 )
 
 const numKeys = 10000

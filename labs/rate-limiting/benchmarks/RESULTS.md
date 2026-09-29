@@ -7,17 +7,20 @@ Measured, not estimated. Reproduce with `make bench LAB=rate-limiting` from the 
 - Go 1.22.2, linux/amd64
 - CPU: Intel Xeon @ 2.10GHz, 1 vCPU (a shared sandbox, not a dedicated benchmarking host, treat these as directional, not a hardware comparison baseline)
 - Command: go test -bench=. -benchmem -run=^$ ./...
-- Date: 2026-09-23
+- Date: 2026-09-28
 
 ## Results
 
 | Benchmark | ns/op | B/op | allocs/op |
 |---|---|---|---|
-| FixedWindow.Allow | 87.91 | 0 | 0 |
-| SlidingWindowCounter.Allow | 101.4 | 0 | 0 |
-| TokenBucket.Allow | 95.37 | 0 | 0 |
-| LeakyBucket.Allow | 103.0 | 0 | 0 |
-| TokenBucket.Allow, 10000 distinct keys | 167.5 | 16 | 1 |
+| FixedWindow.Allow | 87.64 | 0 | 0 |
+| SlidingWindowCounter.Allow | 118.0 | 0 | 0 |
+| TokenBucket.Allow | 108.6 | 0 | 0 |
+| LeakyBucket.Allow (meter) | 106.7 | 0 | 0 |
+| LeakyBucketQueue.Admit | 155.0 | 24 | 1 |
+| TokenBucket.Allow, 10000 distinct keys | 190.5 | 16 | 1 |
+
+These are a second run, taken after LeakyBucketQueue was added. The first run, before it existed, measured the same four algorithms 10 to 15 percent apart in both directions (87.9, 101.4, 95.4, 103.0 and 167.5 ns/op), which is ordinary run to run variance on a shared single vCPU sandbox. Read the ordering and the order of magnitude, not the last digit.
 
 ## Reading these numbers
 
