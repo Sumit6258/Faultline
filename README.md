@@ -18,7 +18,7 @@ Not a system design interview cheat sheet. Not a collection of architecture diag
 
 ## Status
 
-Phase 1, Phase 2, and Phase 3 are done: nine labs, plus two complete systems, URL Shortener and Payment Platform. See [ROADMAP.md](ROADMAP.md) for what's next.
+Phase 1, Phase 2, and Phase 3 are done: nine labs, plus two complete systems, URL Shortener and Payment Platform. Phase 4 is in progress: the [interactive lab](web/interactive-lab) now visualizes three of the labs below in the browser. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Quickstart
 
@@ -55,6 +55,10 @@ More labs and full systems are planned. See [ARCHITECTURE.md](ARCHITECTURE.md) f
 | [Payment Platform](systems/payment-platform) | Idempotency safe under real concurrent requests, and the transactional outbox pattern, proven with a relay that survives a mid-batch crash | Python (FastAPI) |
 
 More systems are planned.
+
+## Interactive lab
+
+[web/interactive-lab](web/interactive-lab) visualizes three labs in the browser: Consistent Hashing, Rate Limiting, and Circuit Breakers. Every algorithm is a real TypeScript port of the corresponding Go lab, not a scripted animation, with 32 tests covering both the algorithms and the UI. See its own README for what's actually been verified so far and what hasn't.
 
 ## Repository map
 

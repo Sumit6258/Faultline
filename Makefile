@@ -1,8 +1,9 @@
-.PHONY: help setup test test-race lint bench run clean
+.PHONY: help setup test test-race lint bench run run-web clean
 
 LABS := rate-limiting caching consistent-hashing distributed-locks leader-election circuit-breakers retries-backoff replication kafka-messaging
 SYSTEMS_GO := url-shortener
 SYSTEMS_PYTHON := payment-platform
+WEB := interactive-lab
 
 help:
 	@echo "Available targets:"
@@ -14,6 +15,7 @@ help:
 	@echo "  make bench SYSTEM=x  run benchmarks for one system, Go or Python"
 	@echo "  make run LAB=x       run a lab's demo binary"
 	@echo "  make run SYSTEM=x    run a system's server"
+	@echo "  make run-web         start the interactive lab's dev server"
 	@echo "  make clean           remove build artifacts"
 
 setup:
@@ -31,6 +33,10 @@ test:
 	@for sys in $(SYSTEMS_PYTHON); do \
 		echo "=== testing systems/$$sys ==="; \
 		(cd systems/$$sys && python3 -m pytest tests/ -q) || exit 1; \
+	done
+	@for w in $(WEB); do \
+		echo "=== testing web/$$w ==="; \
+		(cd web/$$w && test -d node_modules || npm install --silent) && (cd web/$$w && npm test) || exit 1; \
 	done
 
 test-race:
@@ -56,6 +62,10 @@ lint:
 		echo "=== compile-checking systems/$$sys ==="; \
 		(cd systems/$$sys && python3 -m py_compile app/*.py) || exit 1; \
 	done
+	@for w in $(WEB); do \
+		echo "=== type-checking web/$$w ==="; \
+		(cd web/$$w && test -d node_modules || npm install --silent) && (cd web/$$w && npx tsc -b) || exit 1; \
+	done
 
 bench:
 	@if [ -n "$(SYSTEM)" ] && [ -f systems/$(SYSTEM)/go.mod ]; then \
@@ -76,8 +86,11 @@ run:
 	elif [ -n "$(LAB)" ]; then \
 		cd labs/$(LAB) && go run ./cmd/...; \
 	else \
-		echo "usage: make run LAB=rate-limiting  or  make run SYSTEM=url-shortener"; exit 1; \
+		echo "usage: make run LAB=rate-limiting  or  make run SYSTEM=url-shortener  or  make run-web"; exit 1; \
 	fi
+
+run-web:
+	cd web/interactive-lab && (test -d node_modules || npm install) && npm run dev
 
 clean:
 	@for lab in $(LABS); do \
@@ -89,5 +102,8 @@ clean:
 	@for sys in $(SYSTEMS_PYTHON); do \
 		find systems/$$sys -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null; \
 		find systems/$$sys -name '*.db' -delete 2>/dev/null; \
+	done
+	@for w in $(WEB); do \
+		rm -rf web/$$w/dist web/$$w/node_modules web/$$w/*.tsbuildinfo; \
 	done
 	@true

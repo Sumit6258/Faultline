@@ -21,9 +21,10 @@
 - [x] URL Shortener
 - [x] Payment Platform, part 1: idempotency and outbox (Python/FastAPI, see systems/payment-platform's README for why)
 
-## Phase 4: Interactive lab
+## Phase 4: Interactive lab (in progress)
 
-- [ ] Client-side visualizations: consistent hashing ring, rate limiter algorithms, circuit breaker state machine
+- [x] Client-side visualizations: consistent hashing ring, rate limiter algorithms, circuit breaker state machine (web/interactive-lab, 32 tests, not yet visually verified in a real browser, see its README)
+- [ ] Backend-driven visualizations (real consumer lag from a running labs/kafka-messaging instance, and similar)
 - [ ] Notification Platform
 - [ ] Social Feed
 
