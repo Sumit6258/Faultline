@@ -53,7 +53,7 @@ Tier 1, built first:
 |---|---|---|
 | URL Shortener (done) | ID generation, cache-aside, hot key handling | Go |
 | Payment Platform (part 1 done) | idempotency, outbox, saga, reconciliation | Python (FastAPI), part 1 built; saga, fraud, and ledger still planned |
-| Notification Platform | multi-channel fan-out, retry and DLQ | Go |
+| Notification Platform (done) | multi-channel fan-out, retry and DLQ | Go |
 | Social Feed | fan-out on write versus fan-out on read | Go |
 
 Tier 2, built after the core labs exist:

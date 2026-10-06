@@ -18,7 +18,7 @@ Not a system design interview cheat sheet. Not a collection of architecture diag
 
 ## Status
 
-Phase 1, Phase 2, and Phase 3 are done: nine labs, plus two complete systems, URL Shortener and Payment Platform. Phase 4 is in progress: the [interactive lab](web/interactive-lab) now visualizes three of the labs below in the browser. See [ROADMAP.md](ROADMAP.md) for what's next.
+Phase 1, Phase 2, and Phase 3 are done: nine labs, plus two complete systems, URL Shortener and Payment Platform. Phase 4 is in progress: the [interactive lab](web/interactive-lab) visualizes three of the labs below in the browser, and [Notification Platform](systems/notification-platform) is the third complete system. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Quickstart
 
@@ -53,6 +53,7 @@ More labs and full systems are planned. See [ARCHITECTURE.md](ARCHITECTURE.md) f
 |---|---|---|
 | [URL Shortener](systems/url-shortener) | Cache-aside, a per-client rate limiter, async click analytics, and two compared ID generation strategies, wired into one working service | Go |
 | [Payment Platform](systems/payment-platform) | Idempotency safe under real concurrent requests, and the transactional outbox pattern, proven with a relay that survives a mid-batch crash | Python (FastAPI) |
+| [Notification Platform](systems/notification-platform) | A schedule- and priority-aware queue, retry with full jitter backoff, a dead letter queue, deduplication, and per-channel rate limiting, composed into one service | Go |
 
 More systems are planned.
 

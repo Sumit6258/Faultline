@@ -23,9 +23,9 @@
 
 ## Phase 4: Interactive lab (in progress)
 
-- [x] Client-side visualizations: consistent hashing ring, rate limiter algorithms, circuit breaker state machine (web/interactive-lab, 32 tests, not yet visually verified in a real browser, see its README)
+- [x] Client-side visualizations: consistent hashing ring, rate limiter algorithms, circuit breaker state machine (web/interactive-lab, 32 tests, visually verified by Sumit after the Node 24 fix)
+- [x] Notification Platform (systems/notification-platform: priority queue, retry/backoff, DLQ, dedup, per-channel rate limiting)
 - [ ] Backend-driven visualizations (real consumer lag from a running labs/kafka-messaging instance, and similar)
-- [ ] Notification Platform
 - [ ] Social Feed
 
 ## Phase 5: Operability retrofit

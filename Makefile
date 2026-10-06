@@ -1,7 +1,7 @@
 .PHONY: help setup test test-race lint bench run run-web clean
 
 LABS := rate-limiting caching consistent-hashing distributed-locks leader-election circuit-breakers retries-backoff replication kafka-messaging
-SYSTEMS_GO := url-shortener
+SYSTEMS_GO := url-shortener notification-platform
 SYSTEMS_PYTHON := payment-platform
 WEB := interactive-lab
 
