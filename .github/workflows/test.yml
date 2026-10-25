@@ -5,20 +5,101 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  # Every lab and system is its own module. Rather than keep a list of them
+  # here that has to be edited by hand whenever one is added, and silently
+  # goes stale when it isn't, CI looks at what is on disk.
+  discover:
+    name: discover modules
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        lab: [rate-limiting, caching, consistent-hashing]
+    timeout-minutes: 5
+    outputs:
+      go-dirs: ${{ steps.find.outputs.go-dirs }}
+      python-dirs: ${{ steps.find.outputs.python-dirs }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - id: find
+        run: |
+          to_json() { jq -R -s -c 'split("\n") | map(select(length > 0))'; }
+          go_dirs=$(find labs systems -name go.mod -not -path '*/node_modules/*' -exec dirname {} \; | sort | to_json)
+          py_dirs=$(find labs systems -name requirements.txt -not -path '*/node_modules/*' -exec dirname {} \; | sort | to_json)
+          echo "go-dirs=$go_dirs" >> "$GITHUB_OUTPUT"
+          echo "python-dirs=$py_dirs" >> "$GITHUB_OUTPUT"
+          echo "go modules:     $go_dirs"
+          echo "python modules: $py_dirs"
+
+  go:
+    name: go ${{ matrix.dir }}
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: ${{ fromJSON(needs.discover.outputs.go-dirs) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
-          go-version: "1.22"
-      - name: Test
-        working-directory: labs/${{ matrix.lab }}
-        run: go test -race -v ./...
-      - name: Vet
-        working-directory: labs/${{ matrix.lab }}
+          go-version-file: ${{ matrix.dir }}/go.mod
+          cache: false
+      - name: vet
         run: go vet ./...
+      - name: test, with the race detector
+        run: go test -race -count=1 ./...
+
+  python:
+    name: python ${{ matrix.dir }}
+    needs: discover
+    if: needs.discover.outputs.python-dirs != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: ${{ fromJSON(needs.discover.outputs.python-dirs) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ${{ matrix.dir }}/requirements.txt
+      - name: install
+        run: pip install -r requirements.txt
+      - name: test
+        run: python -m pytest tests/ -q
+
+  web:
+    name: web interactive-lab
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web/interactive-lab
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: web/interactive-lab/.nvmrc
+          cache: npm
+          cache-dependency-path: web/interactive-lab/package-lock.json
+      - name: install
+        run: npm ci
+      - name: test
+        run: npm test
+      - name: type-check and build
+        run: npm run build

@@ -5,19 +5,39 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   gofmt:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version: "1.22"
-      - name: Check formatting
+          cache: false
+      - name: check formatting
         run: |
-          unformatted=$(gofmt -l ./labs)
+          unformatted=$(gofmt -l labs systems)
           if [ -n "$unformatted" ]; then
-            echo "The following files need gofmt:"
+            echo "These files need gofmt:"
             echo "$unformatted"
             exit 1
           fi
+
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: syntax check every Python file
+        run: python -m compileall -q labs systems
