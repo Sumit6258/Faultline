@@ -7,13 +7,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pytest
 
-from app.db import connect
+from app.db import connect, open_connection
 from app.payments import create_payment, get_payment, naive_create_payment_no_outbox
 
 
 @pytest.fixture
-def conn(tmp_path):
-    c = connect(str(tmp_path / "test.db"))
+def db_path(tmp_path):
+    return str(tmp_path / "test.db")
+
+
+@pytest.fixture
+def conn(db_path):
+    c = connect(db_path)
     yield c
     c.close()
 
@@ -47,34 +52,52 @@ def test_create_payment_writes_outbox_event_atomically(conn):
     assert key in events[0][1]
 
 
-def test_concurrent_same_key_only_creates_once(conn):
+def test_concurrent_same_key_only_creates_once(conn, db_path):
     # This is the scenario that matters: a client's request timed out, so
     # it retries, but the original request actually succeeded and is still
     # in flight. Both arrive at roughly the same instant with the same
     # idempotency key.
+    #
+    # Every thread opens its own connection, as every request does in the
+    # real server. The first version of this test shared one connection
+    # across the threads, which passed on a single core and failed in CI,
+    # because a shared connection is a shared transaction. See app/db.py.
     key = str(uuid.uuid4())
+    n_threads = 20
     results = []
+    errors = []
     lock = threading.Lock()
+    start_together = threading.Barrier(n_threads)
 
     def attempt():
-        payment, created = create_payment(conn, key, 5000, "usd")
-        with lock:
-            results.append((payment.idempotency_key, created))
+        own = open_connection(db_path)
+        try:
+            start_together.wait()
+            payment, created = create_payment(own, key, 5000, "usd")
+            with lock:
+                results.append((payment.idempotency_key, created))
+        except Exception as e:
+            with lock:
+                errors.append(repr(e))
+        finally:
+            own.close()
 
-    threads = [threading.Thread(target=attempt) for _ in range(20)]
+    threads = [threading.Thread(target=attempt) for _ in range(n_threads)]
     for t in threads:
         t.start()
     for t in threads:
         t.join()
 
+    assert not errors, f"{len(errors)} of {n_threads} concurrent requests raised: {errors[:3]}"
+
     created_count = sum(1 for _, created in results if created)
-    assert created_count == 1, f"expected exactly 1 of 20 concurrent identical requests to actually create a payment, got {created_count}"
+    assert created_count == 1, f"expected exactly 1 of {n_threads} concurrent identical requests to actually create a payment, got {created_count}"
 
     row_count = conn.execute("SELECT COUNT(*) FROM payments WHERE idempotency_key = ?", (key,)).fetchone()[0]
     assert row_count == 1
 
     event_count = conn.execute("SELECT COUNT(*) FROM outbox").fetchone()[0]
-    assert event_count == 1, f"expected exactly 1 outbox event despite 20 concurrent attempts, got {event_count}"
+    assert event_count == 1, f"expected exactly 1 outbox event despite {n_threads} concurrent attempts, got {event_count}"
 
 
 def test_naive_no_outbox_loses_event_on_publish_failure(conn):

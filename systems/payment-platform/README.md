@@ -121,3 +121,13 @@ Full numbers, the concurrent retry demonstration, and the dual write comparison 
 | Python and FastAPI over Java and Spring Boot | Matches the rest of this portfolio and this developer's actual job search, and was fully buildable and testable in this sandbox with no dependency resolution issues | Java's enterprise transaction-management ecosystem, which is what the repository's original plan chose Java specifically to demonstrate, is not exercised here |
 
 That last row is worth being direct about: choosing Python here was about matching an actual career story, not about which language is technically better suited to transactional systems. Both would have worked. This one is more useful to the person building it.
+
+## A failure found by CI
+
+The first version of this system opened one SQLite connection at startup and shared it between every request thread and the outbox relay. It passed every test and the HTTP retry demo on one core, and failed in CI on a multi-core runner.
+
+A connection holds the transaction, not the thread using it, so threads sharing one connection share one transaction. `load_tests/shared_connection_race.py` sends 20 simultaneous requests with the same idempotency key for 500 rounds. With one shared connection, two runs had 51 and 63 rounds go wrong, including 7 silent double charges, payments with two events, and an event with no payment. With a connection per thread, 0 of 500 went wrong in both runs. The script also replays one interleaving deterministically: the relay's commit lands between a request's two inserts, and another connection then sees a committed payment with no event.
+
+The real HTTP retry demo returned exactly one created payment under both designs, because requests arrive staggered over a network. A passing demo is not evidence the design is safe. What catches the original design is `test_concurrent_same_key_only_creates_once`, which starts its threads behind a barrier, and `test_open_connection_returns_independent_connections`, which needs no timing at all.
+
+The fix: `init_db` runs once at startup, each request opens its own connection, the relay owns a separate one, and every test thread opens its own.
