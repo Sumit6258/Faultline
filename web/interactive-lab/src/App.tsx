@@ -2,11 +2,13 @@ import { useState } from "react";
 import { ConsistentHashingViz } from "./components/ConsistentHashingViz";
 import { RateLimiterViz } from "./components/RateLimiterViz";
 import { CircuitBreakerViz } from "./components/CircuitBreakerViz";
+import { KafkaLagLive } from "./components/KafkaLagLive";
 
 const PAGES = {
   "consistent-hashing": { label: "Consistent Hashing", component: ConsistentHashingViz },
   "rate-limiting": { label: "Rate Limiting", component: RateLimiterViz },
   "circuit-breakers": { label: "Circuit Breakers", component: CircuitBreakerViz },
+  "kafka-lag-live": { label: "Kafka Lag (live)", component: KafkaLagLive },
 } as const;
 
 type PageKey = keyof typeof PAGES;

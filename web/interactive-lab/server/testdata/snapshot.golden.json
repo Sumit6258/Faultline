@@ -1,0 +1,31 @@
+{
+  "epoch": 0,
+  "tick": 3,
+  "partitions": 4,
+  "produced": 120,
+  "consumed": 30,
+  "lag": [
+    0,
+    23,
+    42,
+    25
+  ],
+  "totalLag": 90,
+  "owner": [
+    0,
+    1,
+    0,
+    1
+  ],
+  "stalled": [
+    false,
+    true
+  ],
+  "config": {
+    "consumers": 2,
+    "produceRate": 40,
+    "consumeRate": 10,
+    "hotKeyPercent": 20
+  },
+  "producerHalted": false
+}
