@@ -34,7 +34,7 @@ func main() {
 	defer stop()
 	go srv.Run(ctx, *tick)
 
-	httpSrv := &http.Server{Addr: *addr, Handler: srv.Handler(), ReadHeaderTimeout: 5 * time.Second}
+	httpSrv := &http.Server{Addr: *addr, Handler: observe(srv.Handler(), sess, srv), ReadHeaderTimeout: 5 * time.Second}
 	go func() {
 		<-ctx.Done()
 		srv.Close() // end open event streams, or Shutdown would wait on them

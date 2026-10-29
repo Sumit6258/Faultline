@@ -1,0 +1,7 @@
+# Every module that carries a copy of the metrics kit in internal/obs.
+# scripts/sync-obs.sh writes the copies and scripts/check-obs-sync.sh checks them.
+labs/rate-limiting
+systems/url-shortener
+systems/notification-platform
+systems/social-feed
+web/interactive-lab/server

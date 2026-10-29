@@ -1,0 +1,103 @@
+# Alerts for Faultline's services. Each one is tied to a failure mode this
+# repository demonstrates, and each is unit tested in ../tests/rules_test.yml.
+#
+# The thresholds are illustrative. They suit the demo traffic here, not any
+# real deployment, and a real service would set them from its own SLOs.
+groups:
+  - name: faultline_alerts
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job }} is not being scraped"
+          description: "Prometheus has failed to scrape {{ $labels.job }} for a minute. It is down, or its /metrics endpoint is."
+
+      - alert: HighErrorRatio
+        expr: |
+          job:http_request_errors:ratio_rate5m > 0.05
+          and
+          job:http_requests:rate5m > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.job }} is answering more than 5% of requests with a 5xx"
+          description: "The 5xx ratio over five minutes is above 5%. Traffic below 0.1 requests a second is ignored, because one failure there is not a trend."
+
+      - alert: HighLatencyP99
+        expr: |
+          job_route:http_request_duration_seconds:p99_5m > 0.25
+          and on (job, route)
+          sum by (job, route) (rate(http_requests_total[5m])) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p99 latency of {{ $labels.route }} on {{ $labels.job }} is above 250ms"
+          description: "The 99th percentile latency over five minutes has been above 250ms for ten minutes."
+
+      - alert: PaymentOutboxStuck
+        expr: payments_outbox_oldest_pending_age_seconds > 30
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Payment events are not being published"
+          description: "The oldest event in the outbox has waited more than 30 seconds. Payments are committing, but the relay is not announcing them."
+
+      - alert: NotificationDeadLetterQueueGrowing
+        expr: delta(notification_dead_letter_queue_size[10m]) > 5
+        labels:
+          severity: warning
+        annotations:
+          summary: "Notifications are exhausting their retries"
+          description: "More than five notifications reached the dead letter queue in ten minutes. Check the channel they were sent to."
+
+      - alert: NotificationQueueBacklog
+        expr: notification_queue_depth > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 1000 notifications are waiting"
+          description: "Delivery is not keeping up with submissions. Add workers, or look for a slow channel."
+
+      - alert: SocialFeedFanoutAmplificationHigh
+        expr: |
+          sum(rate(socialfeed_inbox_writes_total[5m]))
+          /
+          sum(rate(http_requests_total{job="social-feed", route="/posts", method="POST", status="200"}[5m]))
+          > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Each post is causing more than 1000 inbox writes"
+          description: "A very large account is posting under fan out on write. This is the celebrity problem: the hybrid strategy exists to stop it."
+
+      - alert: URLShortenerCacheHitRatioLow
+        expr: |
+          sum(rate(urlshortener_cache_hits_total[10m]))
+          /
+          (sum(rate(urlshortener_cache_hits_total[10m])) + sum(rate(urlshortener_cache_misses_total[10m])))
+          < 0.5
+          and
+          (sum(rate(urlshortener_cache_hits_total[10m])) + sum(rate(urlshortener_cache_misses_total[10m]))) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Under half of URL resolves are served from the cache"
+          description: "The cache is too small for the working set, or the traffic is not skewed enough to cache."
+
+      - alert: KafkaConsumerLagGrowing
+        expr: deriv(labserver_kafka_total_lag[2m]) > 0 and labserver_kafka_total_lag > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "The consumer group is falling behind"
+          description: "Total lag is above 100 and still climbing. The consumers cannot keep up with the producers."

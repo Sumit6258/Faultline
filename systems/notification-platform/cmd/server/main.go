@@ -78,5 +78,5 @@ func main() {
 	})
 
 	log.Printf("notification-platform listening on %s with %d workers", *addr, *numWorkers)
-	log.Fatal(http.ListenAndServe(*addr, mux))
+	log.Fatal(http.ListenAndServe(*addr, observe(mux, svc)))
 }

@@ -1,0 +1,21 @@
+# Precomputed series that the alerts and dashboards share. Naming follows the
+# Prometheus convention level:metric:operations, where level lists the labels
+# the series keeps.
+groups:
+  - name: faultline_red
+    rules:
+      - record: job:http_requests:rate5m
+        expr: sum by (job) (rate(http_requests_total[5m]))
+
+      - record: job:http_request_errors:ratio_rate5m
+        expr: |
+          sum by (job) (rate(http_requests_total{status=~"5.."}[5m]))
+          /
+          sum by (job) (rate(http_requests_total[5m]))
+
+      - record: job_route:http_request_duration_seconds:p99_5m
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum by (job, route, le) (rate(http_request_duration_seconds_bucket[5m]))
+          )

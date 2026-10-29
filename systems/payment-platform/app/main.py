@@ -15,6 +15,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel
 
 from app.db import init_db, open_connection
+from app.metrics import install as install_metrics
 from app.payments import create_payment, get_payment
 from app.outbox_relay import run_once
 
@@ -22,6 +23,7 @@ DB_PATH = os.environ.get("PAYMENT_DB_PATH", "/tmp/payments.db")
 
 app = FastAPI(title="Faultline Payment Platform")
 init_db(DB_PATH)
+metrics = install_metrics(app, DB_PATH)
 
 published_log: list[tuple[str, str]] = []
 _stop_relay = threading.Event()
@@ -65,6 +67,7 @@ class CreatePaymentRequest(BaseModel):
 @app.post("/payments")
 def create(request: CreatePaymentRequest, idempotency_key: str = Header(..., alias="Idempotency-Key"), conn: sqlite3.Connection = Depends(get_conn)):
     payment, created = create_payment(conn, idempotency_key, request.amount_cents, request.currency)
+    (metrics.payments_created if created else metrics.payments_deduplicated).inc()
     return {
         "idempotency_key": payment.idempotency_key,
         "amount_cents": payment.amount_cents,

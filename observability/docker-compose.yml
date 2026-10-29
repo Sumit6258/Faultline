@@ -1,0 +1,35 @@
+# Prometheus and Grafana for Faultline's services, which run on the host
+# (see scripts/run-services.sh). From the repository root:
+#
+#   docker compose -f observability/docker-compose.yml up
+#
+# Then open Grafana at http://localhost:3000 and Prometheus at http://localhost:9090.
+#
+# Local demo settings only: anonymous read access and a known admin password.
+# Do not expose this stack to a network you do not control.
+services:
+  prometheus:
+    image: prom/prometheus:v3.15.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=2d
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # lets the container reach the host on Linux, Docker Desktop provides it already
+
+  grafana:
+    image: grafana/grafana:13.2.5
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus

@@ -90,5 +90,5 @@ func main() {
 	})
 
 	log.Printf("url-shortener listening on %s", *addr)
-	log.Fatal(http.ListenAndServe(*addr, mux))
+	log.Fatal(http.ListenAndServe(*addr, observe(mux, svc)))
 }

@@ -1,0 +1,301 @@
+# Unit tests for the recording and alert rules, run with:
+#   promtool test rules tests/rules_test.yml
+#
+# Each alert has a case where it must fire and a case where it must not,
+# because a rule that always fires and a rule that never fires both look fine
+# until the day they matter.
+rule_files:
+  - ../rules/recording.yml
+  - ../rules/alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  # ------------------------------------------------------------ recording rules
+  - interval: 1m
+    input_series:
+      - series: 'http_requests_total{job="a", method="GET", route="/x", status="200"}'
+        values: '0+90x20'
+      - series: 'http_requests_total{job="a", method="GET", route="/x", status="500"}'
+        values: '0+5x20'
+      - series: 'http_requests_total{job="a", method="GET", route="/x", status="503"}'
+        values: '0+5x20'
+      - series: 'http_request_duration_seconds_bucket{job="a", route="/x", le="0.1"}'
+        values: '0+0x20'
+      - series: 'http_request_duration_seconds_bucket{job="a", route="/x", le="0.25"}'
+        values: '0+0x20'
+      - series: 'http_request_duration_seconds_bucket{job="a", route="/x", le="0.5"}'
+        values: '0+100x20'
+      - series: 'http_request_duration_seconds_bucket{job="a", route="/x", le="+Inf"}'
+        values: '0+100x20'
+    promql_expr_test:
+      # promtool compares floating point values exactly, so these are rounded
+      # to the precision a person would read them at.
+      - expr: round(job:http_request_errors:ratio_rate5m, 0.001)
+        eval_time: 10m
+        exp_samples:
+          - labels: '{job="a"}'
+            value: 0.1
+      - expr: round(job_route:http_request_duration_seconds:p99_5m, 0.0001)
+        eval_time: 10m
+        exp_samples:
+          # Every request fell between 0.25s and 0.5s, so the 99th percentile
+          # is 99% of the way through that bucket: 0.25 + 0.25 * 0.99.
+          - labels: '{job="a", route="/x"}'
+            value: 0.4975
+
+  # ---------------------------------------------------------------- InstanceDown
+  - interval: 1m
+    input_series:
+      - series: 'up{job="url-shortener", instance="h:1"}'
+        values: '1 1 0 0 0 0 0 0'
+      - series: 'up{job="social-feed", instance="h:2"}'
+        values: '1 0 1 0 1 0 1 0'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: InstanceDown
+        exp_alerts: []  # first seen down at 2m, so pending, and it fires one minute later
+      - eval_time: 6m
+        alertname: InstanceDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: url-shortener
+              instance: "h:1"
+            exp_annotations:
+              summary: "url-shortener is not being scraped"
+              description: "Prometheus has failed to scrape url-shortener for a minute. It is down, or its /metrics endpoint is."
+          # social-feed flaps, and is never down for a whole minute, so it must not appear.
+
+  # ------------------------------------------------------------- HighErrorRatio
+  - interval: 1m
+    input_series:
+      # 10% errors, split between 500 and 503, at 1.67 requests a second: must fire.
+      - series: 'http_requests_total{job="broken", method="GET", route="/x", status="200"}'
+        values: '0+90x20'
+      - series: 'http_requests_total{job="broken", method="GET", route="/x", status="500"}'
+        values: '0+5x20'
+      - series: 'http_requests_total{job="broken", method="GET", route="/x", status="503"}'
+        values: '0+5x20'
+      # 1% errors: healthy.
+      - series: 'http_requests_total{job="healthy", method="GET", route="/x", status="200"}'
+        values: '0+99x20'
+      - series: 'http_requests_total{job="healthy", method="GET", route="/x", status="500"}'
+        values: '0+1x20'
+      # Every request fails, but at 0.05 a second: too little traffic to call it a trend.
+      - series: 'http_requests_total{job="quiet", method="GET", route="/x", status="500"}'
+        values: '0+3x20'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: HighErrorRatio
+        exp_alerts: []  # still within the five minute "for"
+      - eval_time: 12m
+        alertname: HighErrorRatio
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: broken
+            exp_annotations:
+              summary: "broken is answering more than 5% of requests with a 5xx"
+              description: "The 5xx ratio over five minutes is above 5%. Traffic below 0.1 requests a second is ignored, because one failure there is not a trend."
+
+  # -------------------------------------------------------------- HighLatencyP99
+  - interval: 1m
+    input_series:
+      # slow: every request takes between 0.25s and 0.5s.
+      - series: 'http_request_duration_seconds_bucket{job="slow", route="/x", le="0.1"}'
+        values: '0+0x25'
+      - series: 'http_request_duration_seconds_bucket{job="slow", route="/x", le="0.25"}'
+        values: '0+0x25'
+      - series: 'http_request_duration_seconds_bucket{job="slow", route="/x", le="0.5"}'
+        values: '0+60x25'
+      - series: 'http_request_duration_seconds_bucket{job="slow", route="/x", le="+Inf"}'
+        values: '0+60x25'
+      - series: 'http_requests_total{job="slow", method="GET", route="/x", status="200"}'
+        values: '0+60x25'
+      # fast: every request is under 0.1s.
+      - series: 'http_request_duration_seconds_bucket{job="fast", route="/x", le="0.1"}'
+        values: '0+60x25'
+      - series: 'http_request_duration_seconds_bucket{job="fast", route="/x", le="0.25"}'
+        values: '0+60x25'
+      - series: 'http_request_duration_seconds_bucket{job="fast", route="/x", le="0.5"}'
+        values: '0+60x25'
+      - series: 'http_request_duration_seconds_bucket{job="fast", route="/x", le="+Inf"}'
+        values: '0+60x25'
+      - series: 'http_requests_total{job="fast", method="GET", route="/x", status="200"}'
+        values: '0+60x25'
+    alert_rule_test:
+      - eval_time: 8m
+        alertname: HighLatencyP99
+        exp_alerts: []  # slow, but not yet for ten minutes
+      - eval_time: 20m
+        alertname: HighLatencyP99
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: slow
+              route: /x
+            exp_annotations:
+              summary: "p99 latency of /x on slow is above 250ms"
+              description: "The 99th percentile latency over five minutes has been above 250ms for ten minutes."
+
+  # ----------------------------------------------------------- PaymentOutboxStuck
+  - interval: 1m
+    input_series:
+      - series: 'payments_outbox_oldest_pending_age_seconds{job="payment-platform", instance="stuck"}'
+        values: '0 5 40 50 60 70 80 90'
+      - series: 'payments_outbox_oldest_pending_age_seconds{job="payment-platform", instance="healthy"}'
+        values: '0 5 0 5 0 5 0 5'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: PaymentOutboxStuck
+        exp_alerts: []  # over the threshold for the first time, not yet for a minute
+      - eval_time: 6m
+        alertname: PaymentOutboxStuck
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: payment-platform
+              instance: stuck
+            exp_annotations:
+              summary: "Payment events are not being published"
+              description: "The oldest event in the outbox has waited more than 30 seconds. Payments are committing, but the relay is not announcing them."
+
+  # ---------------------------------------------- NotificationDeadLetterQueueGrowing
+  - interval: 1m
+    input_series:
+      - series: 'notification_dead_letter_queue_size{job="notification-platform", instance="growing"}'
+        values: '0+2x20'
+      - series: 'notification_dead_letter_queue_size{job="notification-platform", instance="flat"}'
+        values: '3+0x20'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: NotificationDeadLetterQueueGrowing
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: notification-platform
+              instance: growing
+            exp_annotations:
+              summary: "Notifications are exhausting their retries"
+              description: "More than five notifications reached the dead letter queue in ten minutes. Check the channel they were sent to."
+
+  # --------------------------------------------------------- NotificationQueueBacklog
+  - interval: 1m
+    input_series:
+      - series: 'notification_queue_depth{job="notification-platform", instance="behind"}'
+        values: '1500+0x20'
+      - series: 'notification_queue_depth{job="notification-platform", instance="fine"}'
+        values: '900+0x20'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: NotificationQueueBacklog
+        exp_alerts: []
+      - eval_time: 8m
+        alertname: NotificationQueueBacklog
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: notification-platform
+              instance: behind
+            exp_annotations:
+              summary: "More than 1000 notifications are waiting"
+              description: "Delivery is not keeping up with submissions. Add workers, or look for a slow channel."
+
+  # ---------------------------------------------- SocialFeedFanoutAmplificationHigh
+  - interval: 1m
+    input_series:
+      # 10000 inbox writes per post: a celebrity under fan out on write.
+      - series: 'socialfeed_inbox_writes_total{job="social-feed", instance="celeb"}'
+        values: '0+60000x20'
+      - series: 'http_requests_total{job="social-feed", instance="celeb", method="POST", route="/posts", status="200"}'
+        values: '0+6x20'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: SocialFeedFanoutAmplificationHigh
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: SocialFeedFanoutAmplificationHigh
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "Each post is causing more than 1000 inbox writes"
+              description: "A very large account is posting under fan out on write. This is the celebrity problem: the hybrid strategy exists to stop it."
+  - interval: 1m
+    input_series:
+      # One inbox write per post: ordinary accounts, nothing to see.
+      - series: 'socialfeed_inbox_writes_total{job="social-feed", instance="ordinary"}'
+        values: '0+10x20'
+      - series: 'http_requests_total{job="social-feed", instance="ordinary", method="POST", route="/posts", status="200"}'
+        values: '0+10x20'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: SocialFeedFanoutAmplificationHigh
+        exp_alerts: []
+
+  # ------------------------------------------------ URLShortenerCacheHitRatioLow
+  - interval: 1m
+    input_series:
+      - series: 'urlshortener_cache_hits_total{job="url-shortener", instance="cold"}'
+        values: '0+10x25'
+      - series: 'urlshortener_cache_misses_total{job="url-shortener", instance="cold"}'
+        values: '0+90x25'
+    alert_rule_test:
+      - eval_time: 8m
+        alertname: URLShortenerCacheHitRatioLow
+        exp_alerts: []
+      - eval_time: 22m
+        alertname: URLShortenerCacheHitRatioLow
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "Under half of URL resolves are served from the cache"
+              description: "The cache is too small for the working set, or the traffic is not skewed enough to cache."
+  - interval: 1m
+    input_series:
+      # A healthy hit ratio of 90%.
+      - series: 'urlshortener_cache_hits_total{job="url-shortener", instance="warm"}'
+        values: '0+90x25'
+      - series: 'urlshortener_cache_misses_total{job="url-shortener", instance="warm"}'
+        values: '0+10x25'
+    alert_rule_test:
+      - eval_time: 22m
+        alertname: URLShortenerCacheHitRatioLow
+        exp_alerts: []
+  - interval: 1m
+    input_series:
+      # A poor ratio, but 0.17 requests a second: too little traffic to matter.
+      - series: 'urlshortener_cache_hits_total{job="url-shortener", instance="idle"}'
+        values: '0+1x25'
+      - series: 'urlshortener_cache_misses_total{job="url-shortener", instance="idle"}'
+        values: '0+9x25'
+    alert_rule_test:
+      - eval_time: 22m
+        alertname: URLShortenerCacheHitRatioLow
+        exp_alerts: []
+
+  # ------------------------------------------------------ KafkaConsumerLagGrowing
+  - interval: 1m
+    input_series:
+      - series: 'labserver_kafka_total_lag{job="lab-server", instance="behind"}'
+        values: '0+300x20'
+      - series: 'labserver_kafka_total_lag{job="lab-server", instance="draining"}'
+        values: '6000-300x20'
+      - series: 'labserver_kafka_total_lag{job="lab-server", instance="small"}'
+        values: '0+2x20'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: KafkaConsumerLagGrowing
+        exp_alerts: []
+      - eval_time: 8m
+        alertname: KafkaConsumerLagGrowing
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: lab-server
+              instance: behind
+            exp_annotations:
+              summary: "The consumer group is falling behind"
+              description: "Total lag is above 100 and still climbing. The consumers cannot keep up with the producers."

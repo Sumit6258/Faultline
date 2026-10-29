@@ -25,5 +25,5 @@ func main() {
 	}
 
 	log.Printf("social-feed listening on %s, strategy=%s", *addr, *strategy)
-	log.Fatal(http.ListenAndServe(*addr, socialfeed.NewHandler(svc)))
+	log.Fatal(http.ListenAndServe(*addr, observe(socialfeed.NewHandler(svc), svc)))
 }

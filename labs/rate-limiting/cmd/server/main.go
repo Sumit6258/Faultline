@@ -48,5 +48,5 @@ func main() {
 	})
 
 	log.Printf("rate limiting demo server, algorithm=%s limit=%d listening on %s", *algo, *limit, *addr)
-	log.Fatal(http.ListenAndServe(*addr, mux))
+	log.Fatal(http.ListenAndServe(*addr, observe(mux, *algo)))
 }

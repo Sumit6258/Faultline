@@ -1,0 +1,41 @@
+# Scrape configuration for running Faultline's services on the host while
+# Prometheus runs in Docker (see ../docker-compose.yml). host.docker.internal
+# is the host from inside a container. To run Prometheus directly on the host
+# instead, replace it with localhost.
+#
+# The scrape interval is short so a demo reacts quickly. A production default
+# would be 15 to 60 seconds.
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+rule_files:
+  - rules/*.yml
+
+# The port of each service when run side by side. They all default to 8080,
+# so each is started with its own address, see ../README.md.
+scrape_configs:
+  - job_name: rate-limiting
+    static_configs:
+      - targets: ["host.docker.internal:9101"]
+
+  - job_name: url-shortener
+    static_configs:
+      - targets: ["host.docker.internal:9102"]
+
+  - job_name: notification-platform
+    static_configs:
+      - targets: ["host.docker.internal:9103"]
+
+  - job_name: social-feed
+    static_configs:
+      - targets: ["host.docker.internal:9104"]
+
+  - job_name: payment-platform
+    static_configs:
+      - targets: ["host.docker.internal:9105"]
+
+  # The interactive lab's server, on the port the web dev server proxies to.
+  - job_name: lab-server
+    static_configs:
+      - targets: ["host.docker.internal:8081"]
