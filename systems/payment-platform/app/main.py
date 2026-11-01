@@ -55,8 +55,15 @@ def _relay_loop():
         conn.close()
 
 
-_relay_thread = threading.Thread(target=_relay_loop, daemon=True)
-_relay_thread.start()
+# "embedded" runs the relay on a thread in this process. "external" leaves it to
+# app/relay_worker.py, so the relay can fail, stall or restart on its own.
+RELAY_MODE = os.environ.get("PAYMENT_RELAY", "embedded")
+if RELAY_MODE not in ("embedded", "external"):
+    raise ValueError(f"PAYMENT_RELAY must be 'embedded' or 'external', got {RELAY_MODE!r}")
+_relay_thread = None
+if RELAY_MODE == "embedded":
+    _relay_thread = threading.Thread(target=_relay_loop, daemon=True)
+    _relay_thread.start()
 
 
 class CreatePaymentRequest(BaseModel):
