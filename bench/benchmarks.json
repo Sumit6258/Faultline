@@ -1,0 +1,10 @@
+{
+  "commands": [
+    {
+      "name": "payment-platform",
+      "dir": "systems/payment-platform",
+      "argv": ["${PYTHON}", "benchmarks/bench_create_payment.py", "--format", "go"]
+    }
+  ],
+  "exclude_package_suffixes": ["/internal/obs"]
+}

@@ -107,3 +107,23 @@ clean:
 		rm -rf web/$$w/dist web/$$w/node_modules web/$$w/*.tsbuildinfo; \
 	done
 	@true
+
+
+.PHONY: bench-build bench-all bench-report bench-check bench-ab
+
+bench-build:
+	@cd bench && go build -o ../faultbench ./cmd/faultbench
+
+bench-all: bench-build
+	./faultbench run -count 5 -o bench-results.json
+
+bench-report: bench-all
+	./faultbench report -in bench-results.json -o docs/BENCHMARKS.md
+
+bench-check: bench-build
+	./faultbench check
+
+# make bench-ab BASE=../faultline-base ONLY=labs/caching
+bench-ab: bench-build
+	@test -n "$(BASE)" || { echo "usage: make bench-ab BASE=../faultline-base [ONLY=labs/caching]"; exit 1; }
+	./faultbench ab -old $(BASE) -new . $(if $(ONLY),-only $(ONLY))

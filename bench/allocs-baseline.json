@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "goos": "linux",
+  "goarch": "amd64",
+  "go_minor": "go1.22",
+  "benchtime": "1000x",
+  "entries": {
+    "chaos/proxy|github.com/Sumit6258/Faultline/chaos/proxy|BenchmarkRequestDirect": {
+      "allocs_per_op": 54,
+      "bytes_per_op": 4464
+    },
+    "chaos/proxy|github.com/Sumit6258/Faultline/chaos/proxy|BenchmarkRequestThroughProxy": {
+      "allocs_per_op": 125,
+      "bytes_per_op": 43609
+    },
+    "labs/caching|github.com/Sumit6258/Faultline/labs/caching|BenchmarkLRU_Get_Hit": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/caching|github.com/Sumit6258/Faultline/labs/caching|BenchmarkLRU_Set": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/circuit-breakers|github.com/Sumit6258/Faultline/labs/circuit-breakers|BenchmarkBreaker_Call_Closed_Success": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/circuit-breakers|github.com/Sumit6258/Faultline/labs/circuit-breakers|BenchmarkBreaker_Call_Open_FastReject": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/consistent-hashing|github.com/Sumit6258/Faultline/labs/consistent-hashing|BenchmarkNaiveModN_Get": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 8
+    },
+    "labs/consistent-hashing|github.com/Sumit6258/Faultline/labs/consistent-hashing|BenchmarkRing_Get": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 8
+    },
+    "labs/distributed-locks|github.com/Sumit6258/Faultline/labs/distributed-locks|BenchmarkFencedResource_Write": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/distributed-locks|github.com/Sumit6258/Faultline/labs/distributed-locks|BenchmarkService_TryAcquire_NewResourceEachTime": {
+      "allocs_per_op": 2,
+      "bytes_per_op": 187
+    },
+    "labs/kafka-messaging|github.com/Sumit6258/Faultline/labs/kafka-messaging|BenchmarkConsumerGroup_Commit": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/kafka-messaging|github.com/Sumit6258/Faultline/labs/kafka-messaging|BenchmarkTopic_Produce": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 110
+    },
+    "labs/leader-election|github.com/Sumit6258/Faultline/labs/leader-election|BenchmarkCluster_Heartbeat_SameLeader": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/rate-limiting|github.com/Sumit6258/Faultline/labs/rate-limiting|BenchmarkFixedWindow_Allow": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/rate-limiting|github.com/Sumit6258/Faultline/labs/rate-limiting|BenchmarkLeakyBucketQueue_Admit": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 24
+    },
+    "labs/rate-limiting|github.com/Sumit6258/Faultline/labs/rate-limiting|BenchmarkLeakyBucket_Allow": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/rate-limiting|github.com/Sumit6258/Faultline/labs/rate-limiting|BenchmarkSlidingWindow_Allow": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/rate-limiting|github.com/Sumit6258/Faultline/labs/rate-limiting|BenchmarkTokenBucket_Allow": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/rate-limiting|github.com/Sumit6258/Faultline/labs/rate-limiting|BenchmarkTokenBucket_Allow_ManyKeys": {
+      "allocs_per_op": 2,
+      "bytes_per_op": 169
+    },
+    "labs/replication|github.com/Sumit6258/Faultline/labs/replication|BenchmarkFollower_Sync_NoNewEntries": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/replication|github.com/Sumit6258/Faultline/labs/replication|BenchmarkLeader_Write": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 145
+    },
+    "labs/retries-backoff|github.com/Sumit6258/Faultline/labs/retries-backoff|BenchmarkFixed_Delay": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "labs/retries-backoff|github.com/Sumit6258/Faultline/labs/retries-backoff|BenchmarkFullJitter_Delay": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkCounterInc": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkCounterIncParallel": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkCounterVecLookupAndInc": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 25
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkHandlerBare": {
+      "allocs_per_op": 2,
+      "bytes_per_op": 30
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkHandlerInstrumented": {
+      "allocs_per_op": 7,
+      "bytes_per_op": 144
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkHandlerInstrumentedParallel": {
+      "allocs_per_op": 7,
+      "bytes_per_op": 144
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkHistogramObserve": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 1
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkScrape/series=10": {
+      "allocs_per_op": 53,
+      "bytes_per_op": 2506
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkScrape/series=100": {
+      "allocs_per_op": 328,
+      "bytes_per_op": 22984
+    },
+    "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkScrape/series=500": {
+      "allocs_per_op": 1535,
+      "bytes_per_op": 118813
+    },
+    "systems/notification-platform|github.com/Sumit6258/Faultline/systems/notification-platform/internal/dedup|BenchmarkTracker_Claim_DuplicateID": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "systems/notification-platform|github.com/Sumit6258/Faultline/systems/notification-platform/internal/dedup|BenchmarkTracker_Claim_NewID": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 100
+    },
+    "systems/notification-platform|github.com/Sumit6258/Faultline/systems/notification-platform/internal/queue|BenchmarkQueue_PushPop": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 114
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=1003/fan-out-on-read": {
+      "allocs_per_op": 2011,
+      "bytes_per_op": 402648
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=1003/fan-out-on-write": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 416
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=1003/hybrid": {
+      "allocs_per_op": 14,
+      "bytes_per_op": 18504
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=103/fan-out-on-read": {
+      "allocs_per_op": 211,
+      "bytes_per_op": 42072
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=103/fan-out-on-write": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 416
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=103/hybrid": {
+      "allocs_per_op": 14,
+      "bytes_per_op": 3912
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=13/fan-out-on-read": {
+      "allocs_per_op": 31,
+      "bytes_per_op": 5656
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=13/fan-out-on-write": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 416
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=13/hybrid": {
+      "allocs_per_op": 14,
+      "bytes_per_op": 2328
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=5003/fan-out-on-read": {
+      "allocs_per_op": 10011,
+      "bytes_per_op": 2007256
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=5003/fan-out-on-write": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 416
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=5003/hybrid": {
+      "allocs_per_op": 14,
+      "bytes_per_op": 84040
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkOnPost/fan-out-on-read": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkOnPost/fan-out-on-write": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 33
+    },
+    "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkOnPost/hybrid": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 33
+    },
+    "systems/url-shortener|github.com/Sumit6258/Faultline/systems/url-shortener|BenchmarkService_Resolve_CacheHit": {
+      "allocs_per_op": 0,
+      "bytes_per_op": 0
+    },
+    "systems/url-shortener|github.com/Sumit6258/Faultline/systems/url-shortener|BenchmarkService_Resolve_CacheMiss": {
+      "allocs_per_op": 2,
+      "bytes_per_op": 202
+    },
+    "systems/url-shortener|github.com/Sumit6258/Faultline/systems/url-shortener|BenchmarkService_Shorten": {
+      "allocs_per_op": 3,
+      "bytes_per_op": 182
+    }
+  }
+}

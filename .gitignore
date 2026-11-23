@@ -26,3 +26,8 @@ __pycache__/
 # Env files
 .env
 .env.local
+
+/faultbench
+/bench-results.json
+*.patch
+*.zip

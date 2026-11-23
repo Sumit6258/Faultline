@@ -1,0 +1,31 @@
+name: bench
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bench-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  allocations:
+    name: allocation baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: bench/go.mod
+          cache: false
+      - name: build faultbench
+        run: cd bench && go build -o "$RUNNER_TEMP/faultbench" ./cmd/faultbench
+      # Timings are not checked here: a shared runner is too noisy, and a job that fails on noise gets
+      # ignored. Allocation counts are exact, so those can safely fail the build.
+      - name: check allocations against the baseline
+        run: '"$RUNNER_TEMP/faultbench" check -require-baseline'
