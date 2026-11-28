@@ -299,3 +299,114 @@ tests:
             exp_annotations:
               summary: "The consumer group is falling behind"
               description: "Total lag is above 100 and still climbing. The consumers cannot keep up with the producers."
+
+  # ----------------------------------------------------------- RideShareRidersGivenUp
+  - interval: 1m
+    input_series:
+      # One request in four ends with no driver.
+      - series: 'rideshare_trips_requested_total{job="ride-sharing", instance="short"}'
+        values: '0+40x20'
+      - series: 'rideshare_trips_ended_total{job="ride-sharing", instance="short", outcome="no_drivers"}'
+        values: '0+10x20'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: RideShareRidersGivenUp
+        exp_alerts: []
+      - eval_time: 14m
+        alertname: RideShareRidersGivenUp
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "More than one rider in ten is being given up on"
+              description: "Trips wait the full time allowed and no driver takes them. There are too few drivers where riders are asking, or drivers are ignoring offers."
+  - interval: 1m
+    input_series:
+      # One in a hundred, which is a few riders a day and not an incident.
+      - series: 'rideshare_trips_requested_total{job="ride-sharing", instance="healthy"}'
+        values: '0+100x20'
+      - series: 'rideshare_trips_ended_total{job="ride-sharing", instance="healthy", outcome="no_drivers"}'
+        values: '0+1x20'
+    alert_rule_test:
+      - eval_time: 14m
+        alertname: RideShareRidersGivenUp
+        exp_alerts: []
+  - interval: 1m
+    input_series:
+      # Every rider given up on, but only one a minute: too little traffic to mean anything.
+      - series: 'rideshare_trips_requested_total{job="ride-sharing", instance="quiet"}'
+        values: '0+1x20'
+      - series: 'rideshare_trips_ended_total{job="ride-sharing", instance="quiet", outcome="no_drivers"}'
+        values: '0+1x20'
+    alert_rule_test:
+      - eval_time: 14m
+        alertname: RideShareRidersGivenUp
+        exp_alerts: []
+
+  # ---------------------------------------------------------------- RideShareMatchSlow
+  - interval: 1m
+    input_series:
+      # Every match took between 30 and 60 seconds.
+      - series: 'rideshare_match_wait_seconds_bucket{job="ride-sharing", instance="slow", le="30"}'
+        values: '0+0x20'
+      - series: 'rideshare_match_wait_seconds_bucket{job="ride-sharing", instance="slow", le="60"}'
+        values: '0+100x20'
+      - series: 'rideshare_match_wait_seconds_bucket{job="ride-sharing", instance="slow", le="+Inf"}'
+        values: '0+100x20'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: RideShareMatchSlow
+        exp_alerts: []
+      - eval_time: 14m
+        alertname: RideShareMatchSlow
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "The slowest 5% of riders wait more than 30 seconds for a driver"
+              description: "Matching is slow. Look at the share of offers that expire or are declined, and at whether supply is short."
+  - interval: 1m
+    input_series:
+      # Every match took under two seconds.
+      - series: 'rideshare_match_wait_seconds_bucket{job="ride-sharing", instance="fast", le="2"}'
+        values: '0+100x20'
+      - series: 'rideshare_match_wait_seconds_bucket{job="ride-sharing", instance="fast", le="30"}'
+        values: '0+100x20'
+      - series: 'rideshare_match_wait_seconds_bucket{job="ride-sharing", instance="fast", le="+Inf"}'
+        values: '0+100x20'
+    alert_rule_test:
+      - eval_time: 14m
+        alertname: RideShareMatchSlow
+        exp_alerts: []
+
+  # ------------------------------------------------------ RideShareOffersMostlyIgnored
+  - interval: 1m
+    input_series:
+      # Four offers in ten lapse.
+      - series: 'rideshare_offers_total{job="ride-sharing", instance="deaf", outcome="offered"}'
+        values: '0+50x20'
+      - series: 'rideshare_offers_total{job="ride-sharing", instance="deaf", outcome="expired"}'
+        values: '0+20x20'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: RideShareOffersMostlyIgnored
+        exp_alerts: []
+      - eval_time: 14m
+        alertname: RideShareOffersMostlyIgnored
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "Drivers are letting more than 30% of offers lapse"
+              description: "Each lapsed offer costs the rider the offer's whole time to live before the next driver is tried. Drivers may be offline without having said so, or the offers are not reaching them."
+  - interval: 1m
+    input_series:
+      # The 3% of offers that lapse in an ordinary day.
+      - series: 'rideshare_offers_total{job="ride-sharing", instance="healthy", outcome="offered"}'
+        values: '0+100x20'
+      - series: 'rideshare_offers_total{job="ride-sharing", instance="healthy", outcome="expired"}'
+        values: '0+3x20'
+    alert_rule_test:
+      - eval_time: 14m
+        alertname: RideShareOffersMostlyIgnored
+        exp_alerts: []

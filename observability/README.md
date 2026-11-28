@@ -4,7 +4,7 @@ Metrics, dashboards and alerts for every Faultline service that runs as a server
 
 ## What is covered
 
-Six programs publish metrics: the rate limiting lab's demo server, the URL shortener, the notification platform, the social feed, the payment platform, and the interactive lab's server. The other eight labs are libraries and command line demos with no long running process to scrape, so there is nothing for Prometheus to do with them and they are deliberately left alone.
+Seven programs publish metrics: the rate limiting lab's demo server, the URL shortener, the notification platform, the social feed, the payment platform, the ride sharing system, and the interactive lab's server. The other eight labs are libraries and command line demos with no long running process to scrape, so there is nothing for Prometheus to do with them and they are deliberately left alone.
 
 | Piece | Where |
 |---|---|

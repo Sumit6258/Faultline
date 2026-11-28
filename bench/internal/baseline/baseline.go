@@ -18,6 +18,7 @@ package baseline
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strings"
@@ -106,12 +107,31 @@ func maxF(a, b float64) float64 {
 type Options struct {
 	// AllocTolerance is how many more allocations per operation are tolerated. Zero means none.
 	AllocTolerance float64
+	// AllocRelTolerance is a fraction of the recorded count that is also tolerated, for benchmarks that
+	// allocate at least RelToleranceFloor times. Go's maps allocate a slightly different number of overflow
+	// buckets from run to run, so a benchmark that fills a large map can report 880 allocations one run and 881
+	// the next. Exactness is kept where it matters, on counts below the floor, and above all on zero.
+	AllocRelTolerance float64
 	// Bytes may grow by this factor, plus BytesSlack, before it counts. Bytes are less exact than
 	// counts, because a slice that grows by doubling lands on different sizes, so this is loose.
 	BytesFactor, BytesSlack float64
 }
 
-func DefaultOptions() Options { return Options{AllocTolerance: 0, BytesFactor: 1.25, BytesSlack: 64} }
+// RelToleranceFloor is the allocation count from which the relative tolerance applies.
+const RelToleranceFloor = 100
+
+func DefaultOptions() Options {
+	return Options{AllocTolerance: 0, AllocRelTolerance: 0.01, BytesFactor: 1.25, BytesSlack: 64}
+}
+
+// allowed is how many allocations per operation a benchmark with this baseline may make before it counts as a regression.
+func (o Options) allowed(baseline float64) float64 {
+	tol := o.AllocTolerance
+	if baseline >= RelToleranceFloor {
+		tol = math.Max(tol, math.Floor(baseline*o.AllocRelTolerance))
+	}
+	return baseline + tol
+}
 
 type Finding struct {
 	Key     string
@@ -163,7 +183,7 @@ func Check(b Baseline, cur model.File, o Options) Result {
 		allocs := stats.Summarize(s.Samples["allocs/op"]).Median
 		bytes := stats.Summarize(s.Samples["B/op"]).Median
 		switch {
-		case allocs > e.Allocs+o.AllocTolerance:
+		case allocs > o.allowed(e.Allocs):
 			r.Regressions = append(r.Regressions, Finding{key, fmt.Sprintf("allocs/op went from %.0f to %.0f", e.Allocs, allocs)})
 		case bytes > e.Bytes*o.BytesFactor+o.BytesSlack:
 			r.Regressions = append(r.Regressions, Finding{key, fmt.Sprintf("B/op went from %.0f to %.0f", e.Bytes, bytes)})

@@ -149,3 +149,51 @@ func TestToleranceCanBeRaised(t *testing.T) {
 		t.Errorf("%+v", r)
 	}
 }
+
+func TestLargeCountsToleratePlusOrMinusAFewButSmallOnesAreExact(t *testing.T) {
+	big := Build(file(env(), ser("BenchmarkBig", rep(880, 3), rep(50000, 3)), ser("BenchmarkSmall", rep(50, 3), rep(2000, 3)), ser("BenchmarkHot", rep(0, 3), rep(0, 3))))
+	run := func(name string, allocs float64) Result {
+		return Check(big, file(env(), ser(name, rep(allocs, 1), rep(50000, 1))), DefaultOptions())
+	}
+	if r := run("BenchmarkBig", 884); len(r.Regressions) != 0 {
+		t.Errorf("880 to 884 is map noise: %+v", r.Regressions)
+	}
+	if r := run("BenchmarkBig", 888); len(r.Regressions) != 0 {
+		t.Errorf("880 to 888 is within 1%%: %+v", r.Regressions)
+	}
+	if r := run("BenchmarkBig", 900); len(r.Regressions) != 1 {
+		t.Errorf("880 to 900 is a real increase: %+v", r.Regressions)
+	}
+	if r := run("BenchmarkSmall", 51); len(r.Regressions) != 1 {
+		t.Errorf("50 to 51 must still be caught, there is no tolerance below %d: %+v", RelToleranceFloor, r.Regressions)
+	}
+	if r := run("BenchmarkHot", 1); len(r.Regressions) != 1 {
+		t.Errorf("0 to 1 must always be caught: %+v", r.Regressions)
+	}
+}
+
+func TestTheRelativeToleranceStartsAtTheFloor(t *testing.T) {
+	o := DefaultOptions()
+	if got := o.allowed(99); got != 99 {
+		t.Errorf("99 allocations allow %v", got)
+	}
+	if got := o.allowed(100); got != 101 {
+		t.Errorf("100 allocations allow %v, want 101", got)
+	}
+	if got := o.allowed(0); got != 0 {
+		t.Errorf("zero allows %v", got)
+	}
+	o.AllocTolerance = 3
+	if got := o.allowed(50); got != 53 {
+		t.Errorf("the absolute tolerance still applies below the floor: %v", got)
+	}
+	// With a generous relative tolerance the floor is what keeps small counts exact, which the default 1% cannot show,
+	// because 1% of anything under 100 rounds down to nothing anyway.
+	generous := Options{AllocRelTolerance: 0.1}
+	if got := generous.allowed(50); got != 50 {
+		t.Errorf("below the floor the relative tolerance must not apply: %v", got)
+	}
+	if got := generous.allowed(200); got != 220 {
+		t.Errorf("above it, 10%% of 200 is 20: %v", got)
+	}
+}

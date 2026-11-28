@@ -6,3 +6,4 @@ systems/notification-platform
 systems/social-feed
 web/interactive-lab/server
 chaos/proxy
+systems/ride-sharing

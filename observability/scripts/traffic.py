@@ -28,6 +28,7 @@ PORTS = {
     "notification-platform": 9103,
     "social-feed": 9104,
     "payment-platform": 9105,
+    "ride-sharing": 9106,
     "lab-server": 8081,
 }
 
@@ -136,6 +137,44 @@ def payments(base: str, deadline: float, rng: random.Random):
         time.sleep(rng.uniform(0.01, 0.06))
 
 
+def ride_sharing(base: str, deadline: float, rng: random.Random):
+    """Twelve drivers who always answer, riders who ask for trips, and one rider in four in a far corner where no
+    driver is within reach, who are given up on. That last group is what makes the rider-given-up alert real."""
+    centre = (12.97, 77.59)
+    drivers = [f"driver{i:02d}" for i in range(12)]
+    here = {d: (centre[0] + rng.uniform(-0.01, 0.01), centre[1] + rng.uniform(-0.01, 0.01)) for d in drivers}
+    on_trip = {}  # trip id -> (driver, the next step to take)
+    last_ping = {}
+    rider = 0
+    next_rider = time.time()
+    while until(deadline):
+        now = time.time()
+        for d in drivers:
+            if now - last_ping.get(d, 0) > 3:
+                call("ride-sharing", "POST", f"{base}/drivers/{d}/location", {"lat": here[d][0], "lon": here[d][1]})
+                last_ping[d] = now
+            status, text = call("ride-sharing", "GET", f"{base}/drivers/{d}/offer")
+            if status == 200:
+                trip = json.loads(text)["trip_id"]
+                if call("ride-sharing", "POST", f"{base}/drivers/{d}/trips/{trip}/accept")[0] == 200:
+                    on_trip[trip] = (d, "arrive")
+        for trip, (d, step) in list(on_trip.items()):
+            call("ride-sharing", "POST", f"{base}/drivers/{d}/trips/{trip}/{step}")
+            nxt = {"arrive": "start", "start": "complete"}.get(step)
+            if nxt:
+                on_trip[trip] = (d, nxt)
+            else:
+                del on_trip[trip]
+        if now >= next_rider:
+            far = rider % 4 == 3
+            lat, lon = (13.085, 77.74) if far else (centre[0] + rng.uniform(-0.008, 0.008), centre[1] + rng.uniform(-0.008, 0.008))
+            call("ride-sharing", "POST", base + "/trips", {"rider": f"rider{rider}", "from": {"lat": lat, "lon": lon},
+                                                           "to": {"lat": centre[0] + rng.uniform(-0.02, 0.02), "lon": centre[1] + rng.uniform(-0.02, 0.02)}})
+            rider += 1
+            next_rider = now + 0.7
+        time.sleep(0.25)
+
+
 def lab_server(base: str, deadline: float, rng: random.Random):
     while until(deadline):
         call("lab-server", "GET", base + "/api/kafka/state")
@@ -158,6 +197,7 @@ def main():
         "url-shortener": url_shortener,
         "notification-platform": notifications,
         "payment-platform": payments,
+        "ride-sharing": ride_sharing,
         "lab-server": lab_server,
     }
     threads = []

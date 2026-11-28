@@ -35,6 +35,10 @@ scrape_configs:
     static_configs:
       - targets: ["host.docker.internal:9105"]
 
+  - job_name: ride-sharing
+    static_configs:
+      - targets: ["host.docker.internal:9106"]
+
   # The interactive lab's server, on the port the web dev server proxies to.
   - job_name: lab-server
     static_configs:

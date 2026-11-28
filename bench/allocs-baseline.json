@@ -79,7 +79,7 @@
     },
     "labs/rate-limiting|github.com/Sumit6258/Faultline/labs/rate-limiting|BenchmarkTokenBucket_Allow_ManyKeys": {
       "allocs_per_op": 2,
-      "bytes_per_op": 169
+      "bytes_per_op": 170
     },
     "labs/replication|github.com/Sumit6258/Faultline/labs/replication|BenchmarkFollower_Sync_NoNewEntries": {
       "allocs_per_op": 0,
@@ -119,7 +119,7 @@
     },
     "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkHandlerInstrumentedParallel": {
       "allocs_per_op": 7,
-      "bytes_per_op": 144
+      "bytes_per_op": 145
     },
     "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkHistogramObserve": {
       "allocs_per_op": 0,
@@ -135,7 +135,7 @@
     },
     "observability/kit/go|github.com/Sumit6258/Faultline/observability/kit/go/obs|BenchmarkScrape/series=500": {
       "allocs_per_op": 1535,
-      "bytes_per_op": 118813
+      "bytes_per_op": 118814
     },
     "systems/notification-platform|github.com/Sumit6258/Faultline/systems/notification-platform/internal/dedup|BenchmarkTracker_Claim_DuplicateID": {
       "allocs_per_op": 0,
@@ -143,11 +143,131 @@
     },
     "systems/notification-platform|github.com/Sumit6258/Faultline/systems/notification-platform/internal/dedup|BenchmarkTracker_Claim_NewID": {
       "allocs_per_op": 0,
-      "bytes_per_op": 100
+      "bytes_per_op": 99
     },
     "systems/notification-platform|github.com/Sumit6258/Faultline/systems/notification-platform/internal/queue|BenchmarkQueue_PushPop": {
       "allocs_per_op": 1,
       "bytes_per_op": 114
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/dispatch|BenchmarkPropose/batched/waiting=10": {
+      "allocs_per_op": 205,
+      "bytes_per_op": 58007
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/dispatch|BenchmarkPropose/batched/waiting=150": {
+      "allocs_per_op": 2560,
+      "bytes_per_op": 3072470
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/dispatch|BenchmarkPropose/batched/waiting=50": {
+      "allocs_per_op": 880,
+      "bytes_per_op": 512754
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/dispatch|BenchmarkPropose/greedy/waiting=10": {
+      "allocs_per_op": 122,
+      "bytes_per_op": 10444
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/dispatch|BenchmarkPropose/greedy/waiting=150": {
+      "allocs_per_op": 1804,
+      "bytes_per_op": 169866
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/dispatch|BenchmarkPropose/greedy/waiting=50": {
+      "allocs_per_op": 616,
+      "bytes_per_op": 58503
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkNearest/brute/drivers=1000": {
+      "allocs_per_op": 9,
+      "bytes_per_op": 3347
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkNearest/brute/drivers=10000": {
+      "allocs_per_op": 12,
+      "bytes_per_op": 35734
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkNearest/brute/drivers=100000": {
+      "allocs_per_op": 17,
+      "bytes_per_op": 450704
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkNearest/grid/drivers=1000": {
+      "allocs_per_op": 13,
+      "bytes_per_op": 1636
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkNearest/grid/drivers=10000": {
+      "allocs_per_op": 12,
+      "bytes_per_op": 3170
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkNearest/grid/drivers=100000": {
+      "allocs_per_op": 17,
+      "bytes_per_op": 24325
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkUpsertParallel": {
+      "allocs_per_op": 1,
+      "bytes_per_op": 9
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkGreedy/riders=10": {
+      "allocs_per_op": 2,
+      "bytes_per_op": 96
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkGreedy/riders=200": {
+      "allocs_per_op": 2,
+      "bytes_per_op": 2000
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkGreedy/riders=50": {
+      "allocs_per_op": 2,
+      "bytes_per_op": 480
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkOptimal/riders=10": {
+      "allocs_per_op": 19,
+      "bytes_per_op": 1904
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkOptimal/riders=200": {
+      "allocs_per_op": 209,
+      "bytes_per_op": 376016
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkOptimal/riders=50": {
+      "allocs_per_op": 59,
+      "bytes_per_op": 25056
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkOptimalLopsided/riders=10/drivers=80": {
+      "allocs_per_op": 19,
+      "bytes_per_op": 10496
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkOptimalLopsided/riders=150/drivers=1200": {
+      "allocs_per_op": 159,
+      "bytes_per_op": 1507328
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/match|BenchmarkOptimalLopsided/riders=50/drivers=400": {
+      "allocs_per_op": 59,
+      "bytes_per_op": 189568
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkHTTPDriverPing": {
+      "allocs_per_op": 28,
+      "bytes_per_op": 6841
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkRequestMatchAndCancel/greedy/brute/drivers=5000": {
+      "allocs_per_op": 46,
+      "bytes_per_op": 93592
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkRequestMatchAndCancel/greedy/grid/drivers=5000": {
+      "allocs_per_op": 50,
+      "bytes_per_op": 7664
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkTick/batched/drivers=5000/waiting=200": {
+      "allocs_per_op": 359,
+      "bytes_per_op": 166289
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkTick/greedy/drivers=5000/waiting=0": {
+      "allocs_per_op": 150,
+      "bytes_per_op": 25055
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkTick/greedy/drivers=5000/waiting=200": {
+      "allocs_per_op": 359,
+      "bytes_per_op": 161473
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkUpdateLocation": {
+      "allocs_per_op": 39,
+      "bytes_per_op": 5358
+    },
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkUpdateLocationParallel": {
+      "allocs_per_op": 39,
+      "bytes_per_op": 5345
     },
     "systems/social-feed|github.com/Sumit6258/Faultline/systems/social-feed/internal/timeline|BenchmarkGetTimeline/followees=1003/fan-out-on-read": {
       "allocs_per_op": 2011,
@@ -219,7 +339,13 @@
     },
     "systems/url-shortener|github.com/Sumit6258/Faultline/systems/url-shortener|BenchmarkService_Shorten": {
       "allocs_per_op": 3,
-      "bytes_per_op": 182
+      "bytes_per_op": 184
     }
-  }
+  },
+  "unstable": [
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing/internal/geo|BenchmarkUpsertMove",
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkTick/batched/drivers=5000/waiting=0",
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkTick/batched/drivers=5000/waiting=50",
+    "systems/ride-sharing|github.com/Sumit6258/Faultline/systems/ride-sharing|BenchmarkTick/greedy/drivers=5000/waiting=50"
+  ]
 }

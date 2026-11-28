@@ -43,6 +43,8 @@ start_go rate-limiting         labs/rate-limiting            ./cmd/server    -ad
 start_go url-shortener         systems/url-shortener         ./cmd/server    -addr 127.0.0.1:9102
 start_go notification-platform systems/notification-platform ./cmd/server    -addr 127.0.0.1:9103
 start_go social-feed           systems/social-feed           ./cmd/server    -addr 127.0.0.1:9104 -strategy write
+# A short match wait and offer lifetime, so riders with no driver in reach are given up on within the run.
+start_go ride-sharing          systems/ride-sharing          ./cmd/server    -addr 127.0.0.1:9106 -strategy batched -match-wait 10s -offer-ttl 4s
 start_go lab-server            web/interactive-lab/server    ./cmd/labserver -addr 127.0.0.1:8081
 (cd "$root/systems/payment-platform" && PAYMENT_DB_PATH="$work/payments.db" exec "$PYTHON" -m uvicorn app.main:app --host 127.0.0.1 --port 9105 --log-level warning) > "$work/payment-platform.log" 2>&1 &
 pids+=($!)
@@ -59,7 +61,7 @@ done
 pids+=($!)
 
 for i in $(seq 1 30); do curl -sf http://127.0.0.1:9090/-/ready > /dev/null && break; sleep 1; done
-for port in 9101 9102 9103 9104 9105 8081; do
+for port in 9101 9102 9103 9104 9105 9106 8081; do
   for i in $(seq 1 30); do curl -sf "http://127.0.0.1:$port/metrics" > /dev/null && break; sleep 1; done
 done
 

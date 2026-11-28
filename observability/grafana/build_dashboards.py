@@ -166,6 +166,27 @@ def systems_board() -> dict:
         ("rate(labserver_kafka_consumed_total[$__rate_interval])", "consumed"),
     ], "ops", "Lag grows whenever the first line is above the second.")
     b.timeseries("Browser tabs on the live page", [("labserver_stream_subscribers", "subscribers")], "short")
+
+    b.row("Ride sharing: matching and supply")
+    b.timeseries("How long riders wait for a driver (p50 and p95)", [
+        ('histogram_quantile(0.5, sum by (le) (rate(rideshare_match_wait_seconds_bucket[$__rate_interval])))', "p50"),
+        ('histogram_quantile(0.95, sum by (le) (rate(rideshare_match_wait_seconds_bucket[$__rate_interval])))', "p95"),
+    ], "s", "From asking to a driver accepting. The RideShareMatchSlow alert fires when the p95 is above 30 seconds.", threshold=30)
+    b.timeseries("How trips end", [
+        ('sum by (outcome) (rate(rideshare_trips_ended_total[$__rate_interval]))', "{{outcome}}"),
+    ], "ops", "no_drivers is a rider the service gave up on. RideShareRidersGivenUp fires when it is more than one in ten.", stack=True)
+    b.timeseries("Offers to drivers", [
+        ('sum by (outcome) (rate(rideshare_offers_total[$__rate_interval]))', "{{outcome}}"),
+    ], "ops", "Every expired offer costs a rider the offer's whole time to live before the next driver is tried.")
+    b.timeseries("Drivers by state", [("rideshare_drivers", "{{state}}")], "short",
+                 "Available drivers near zero while trips are pending is a supply shortage.", stack=True)
+    b.timeseries("Trips waiting for a driver", [("rideshare_pending_trips", "waiting"), ("rideshare_active_trips", "with a driver")], "short")
+    b.timeseries("Highest surge multiplier", [("rideshare_surge_multiplier_max", "highest")], "short",
+                 "The price multiplier in the busiest neighbourhood. It moves in steps and is capped at 3.")
+    b.timeseries("Drivers examined per nearest driver search", [(
+        'rate(rideshare_geo_candidates_scanned_total[$__rate_interval]) / rate(rideshare_geo_queries_total[$__rate_interval])', "per search")], "short",
+        "What the grid index costs. With brute force this equals the number of drivers online.")
+    b.timeseries("Matching strategy in use", [("rideshare_strategy_info", "{{strategy}} on {{index}}")], "short")
     return b.build()
 
 

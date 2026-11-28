@@ -33,6 +33,7 @@ start_go rate-limiting         labs/rate-limiting            ./cmd/server    -ad
 start_go url-shortener         systems/url-shortener         ./cmd/server    -addr 127.0.0.1:9102
 start_go notification-platform systems/notification-platform ./cmd/server    -addr 127.0.0.1:9103
 start_go social-feed           systems/social-feed           ./cmd/server    -addr 127.0.0.1:9104 -strategy write
+start_go ride-sharing          systems/ride-sharing          ./cmd/server    -addr 127.0.0.1:9106 -strategy batched
 start_go lab-server            web/interactive-lab/server    ./cmd/labserver -addr 127.0.0.1:8081
 
 (cd "$root/systems/payment-platform" && PAYMENT_DB_PATH="$bin/payments.db" exec "${PYTHON:-python3}" -m uvicorn app.main:app --host 127.0.0.1 --port 9105 --log-level warning) > "$bin/payment-platform.log" 2>&1 &
@@ -40,6 +41,6 @@ pids+=($!)
 echo "started payment-platform"
 
 echo
-echo "All six are up. Metrics are at http://127.0.0.1:<port>/metrics, ports 9101 to 9105 and 8081."
+echo "All seven are up. Metrics are at http://127.0.0.1:<port>/metrics, ports 9101 to 9106 and 8081."
 echo "Logs are in $bin. Press Ctrl-C to stop."
 wait

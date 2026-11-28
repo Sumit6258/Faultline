@@ -24,11 +24,11 @@ import urllib.request
 
 OBS = pathlib.Path(__file__).resolve().parents[1]
 PORTS = {"rate-limiting": 9101, "url-shortener": 9102, "notification-platform": 9103,
-         "social-feed": 9104, "payment-platform": 9105, "lab-server": 8081}
+         "social-feed": 9104, "payment-platform": 9105, "ride-sharing": 9106, "lab-server": 8081}
 
 # Alerts that real conditions in the demo traffic must raise, and alerts that must stay quiet.
-MUST_FIRE = ["KafkaConsumerLagGrowing", "SocialFeedFanoutAmplificationHigh", "NotificationDeadLetterQueueGrowing", "InstanceDown"]
-MUST_BE_QUIET = ["PaymentOutboxStuck", "HighErrorRatio", "HighLatencyP99", "NotificationQueueBacklog", "URLShortenerCacheHitRatioLow"]
+MUST_FIRE = ["KafkaConsumerLagGrowing", "SocialFeedFanoutAmplificationHigh", "NotificationDeadLetterQueueGrowing", "InstanceDown", "RideShareRidersGivenUp"]
+MUST_BE_QUIET = ["PaymentOutboxStuck", "HighErrorRatio", "HighLatencyP99", "NotificationQueueBacklog", "URLShortenerCacheHitRatioLow", "RideShareMatchSlow", "RideShareOffersMostlyIgnored"]
 
 # Dashboard panels that legitimately show nothing under the demo traffic, and why.
 MAY_BE_EMPTY = {
